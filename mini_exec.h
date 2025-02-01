@@ -58,7 +58,7 @@ char	*ft_strjoin_cwd(char *s1, char *s2);
 t_parse	*parsing(char *str);
 int		check_env(char *env[]);
 int		exec(t_parse *parse_result, t_data *data);
-int		ft_ope(t_parse *parse_result, t_data *data);
+int		ft_ope(t_parse **parse_result, t_data *data);
 void	handle_pipe(char *av[], t_data *data, int fd[]);
 void	exec_cmd(char *av[], t_data *data);
 int		ft_strcmp(const char *s1, const char *s2);

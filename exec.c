@@ -10,21 +10,20 @@ int	exec(t_parse *parse_result, t_data *data)
 	cmd_index = 0;
 	data->infile = 0;
 	data->outfile = 1;
+	av[cmd_index] = NULL;
 
 	while (parse_result)
 	{
 		if (parse_result->type == ARG)
 			av[cmd_index++] = parse_result->str;
 		else if (parse_result->type == SL || parse_result->type == DL || parse_result->type == SR || parse_result->type == DR)
-		{
-			ft_ope(parse_result, data);
-			parse_result = parse_result->next;
-		}
+			ft_ope(&parse_result, data);
 		else if (parse_result->type == PIPE)
 		{
 			av[cmd_index] = NULL;
 			handle_pipe(av, data, fd);
 			cmd_index = 0;
+			close(fd[1]);
 			data->infile = fd[0];
 		}
 		else if (parse_result->type == ABS_PATH)
@@ -36,9 +35,12 @@ int	exec(t_parse *parse_result, t_data *data)
 	if (cmd_index > 0)
 	{
 		av[cmd_index] = NULL;
-		data->outfile = STDOUT_FILENO;
 		exec_cmd(av, data);
 		printf("last command runned\n");
 	}
+	if (data->infile != STDIN_FILENO)
+        close(data->infile);
+    if (data->outfile != STDOUT_FILENO)
+        close(data->outfile);
 	return (0);
 }

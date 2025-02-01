@@ -119,6 +119,14 @@ void	exec_cmd(char *av[], t_data *data)
 	else
 	{
 		path = find_path(av[0], data->env);
-		execve(path, av, data->env);
+		if (execve(path, av, data->env) == -1)
+		{
+			perror("execve failed");
+			exit (127);
+		}
 	}
+	if (data->infile != STDIN_FILENO)
+        close(data->infile); 
+    if (data->outfile != STDOUT_FILENO)
+        close(data->outfile);
 }
