@@ -37,54 +37,36 @@ static int	last_exec(char *av[], int cmd_index, t_data *data)
 	return (0);
 }
 
-// static void	mid_exec(t_parse *p_result, int *cmd_i, char *av[], t_data *data, int fd[])
-// {
-// 	if (p_result->type == ARG)
-// 		av[(*cmd_i)++] = p_result->str;
-// 	else if (p_result->type == SL || p_result->type == DL \
-// 			|| p_result->type == SR || p_result->type == DR)
-// 		ft_ope(&p_result, data, av, cmd_i);
-// 	else if (p_result->type == PIPE)
-// 	{
-// 		av[*cmd_i] = NULL;
-// 		handle_pipe(av, data, fd);
-// 		*cmd_i = 0;
-// 		close(fd[1]);
-// 		data->infile = fd[0];
-// 	}
-// 	else if (p_result->type == ABS_PATH)
-// 		av[(*cmd_i)++] = p_result->str;
-// 	else
-// 		av[(*cmd_i)++] = p_result->str;
-// }
+static void	mid_exec(t_parse **p_result, int *cmd_i, char *av[], t_data *data)
+{
+	if ((*p_result)->type == ARG)
+		av[(*cmd_i)++] = (*p_result)->str;
+	else if ((*p_result)->type == SL || (*p_result)->type == DL \
+			|| (*p_result)->type == SR || (*p_result)->type == DR)
+		ft_ope(p_result, data, av, *cmd_i);
+	else if ((*p_result)->type == PIPE)
+	{
+		av[*cmd_i] = NULL;
+		handle_pipe(av, data, data->fd);
+		*cmd_i = 0;
+		close(data->fd[1]);
+		data->infile = data->fd[0];
+	}
+	else if ((*p_result)->type == ABS_PATH)
+		av[(*cmd_i)++] = (*p_result)->str;
+	else
+		av[(*cmd_i)++] = (*p_result)->str;
+}
 
 int	exec(t_parse *parse_result, t_data *data)
 {
 	char	*av[BUFFER_SIZE];
 	int		cmd_index;
-	int		result;
-	int		fd[2];
 
 	exec_init(&cmd_index, data, av);
 	while (parse_result)
 	{
-		if (parse_result->type == ARG)
-			av[(cmd_index)++] = parse_result->str;
-		else if (parse_result->type == SL || parse_result->type == DL \
-				|| parse_result->type == SR || parse_result->type == DR)
-			ft_ope(&parse_result, data, av, cmd_index);
-		else if (parse_result->type == PIPE)
-		{
-			av[cmd_index] = NULL;
-			handle_pipe(av, data, fd);
-			cmd_index = 0;
-			close(fd[1]);
-			data->infile = fd[0];
-		}
-		else if (parse_result->type == ABS_PATH)
-			av[(cmd_index)++] = parse_result->str;
-		else
-			av[(cmd_index)++] = parse_result->str;
+		mid_exec(&parse_result, &cmd_index, av, data);
 		parse_result = parse_result->next;
 	}
 	if (cmd_index > 0)

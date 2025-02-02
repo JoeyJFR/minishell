@@ -25,6 +25,7 @@ int	main(int argc, char *argv[], char *env[])
 	char	*cwd;
 	t_data	data;
 	t_parse	*parse_result;
+	pid_t	pid;
 
 	cwd = set_prompt();
 	while (1)
@@ -60,11 +61,25 @@ int	main(int argc, char *argv[], char *env[])
 			return (1);
 		}
 		data.env = env;
-		if (exec(parse_result, &data) == -1)
+		pid = fork();
+		if (pid == -1)
 		{
-			printf("error in exec.\n");
-			//free t_parse struct
-			exit (-1);
+			perror("fork");
+			return (1);
+		}
+		if (pid == 0)
+		{
+			//exec in child process
+			if (exec(parse_result, &data) == -1)
+			{
+				printf("error in exec.\n");
+				//free t_parse struct
+				exit (-1);
+			}
+		}
+		else
+		{
+			waitpid(pid, NULL, 0);
 		}
 	}
 	free(cwd);

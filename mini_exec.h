@@ -55,6 +55,7 @@ typedef struct s_data
 	t_parse	*cmd_pos;
 	int		infile;
 	int		outfile;
+	int		fd[2];
 }	t_data;
 
 char	*ft_strjoin_cwd(char *s1, char *s2);
