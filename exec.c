@@ -6,6 +6,7 @@ static void	exec_init(int *cmd_index, t_data *data, char *av[])
 	data->infile = 0;
 	data->outfile = 1;
 	av[0] = NULL;
+	data->here_doc = 0;
 }
 
 static int	last_exec(char *av[], int cmd_index, t_data *data)

@@ -19,9 +19,6 @@ void	dl(t_parse **parse_result, t_data *data, char *av[])
 	{
 		if (*parse_result && (*parse_result)->type == ARG)
 			handle_heredoc(*parse_result, data);
-		if (dup2(data->infile, STDIN_FILENO) == -1)
-			perror("dup2");
-		close(data->infile);
 	}
 }
 

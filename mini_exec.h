@@ -9,8 +9,9 @@
 # include <fcntl.h>
 # include <sys/wait.h>
 
+//ARG_MAX = 2097152 bytes
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 100
+#  define BUFFER_SIZE 1000
 # endif
 
 typedef enum s_type
@@ -56,6 +57,7 @@ typedef struct s_data
 	int		infile;
 	int		outfile;
 	int		fd[2];
+	int		here_doc;
 }	t_data;
 
 char	*ft_strjoin_cwd(char *s1, char *s2);
