@@ -33,6 +33,9 @@ void	sr(t_parse **parse_result, t_data *data)
 					O_CREAT | O_WRONLY | O_TRUNC, 0644);
 			if (data->outfile == -1)
 				perror("open");
+			if (dup2(data->outfile, STDOUT_FILENO) == -1)
+				perror("dup2");
+			close(data->outfile);
 		}
 	}
 }
@@ -47,6 +50,9 @@ void	dr(t_parse **parse_result, t_data *data)
 					O_CREAT | O_WRONLY | O_APPEND, 0644);
 			if (data->outfile == -1)
 				perror("open");
+			if (dup2(data->outfile, STDIN_FILENO) == -1)
+				perror("dup2");
+			close(data->outfile);
 		}
 	}
 }

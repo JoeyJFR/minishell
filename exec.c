@@ -35,8 +35,29 @@ int	exec(t_parse *parse_result, t_data *data)
 	if (cmd_index > 0)
 	{
 		av[cmd_index] = NULL;
-		exec_cmd(av, data);
-		printf("last command runned\n");
+		if (data->outfile != STDOUT_FILENO)
+		{
+			if (dup2(data->outfile, STDOUT_FILENO) == -1)
+			{
+				perror("dup2");
+				return (1);
+			}
+			close(data->outfile);
+		}
+		if (data->infile != STDIN_FILENO)
+		{
+			if (dup2(data->infile, STDIN_FILENO) == -1)
+			{
+				perror("dup2");
+				return (1);
+			}
+			close(data->infile);
+		}
+		if (exec_cmd(av, data) == -1)
+		{
+			perror("execute");
+			return (1);
+		}
 	}
 	if (data->infile != STDIN_FILENO)
         close(data->infile);

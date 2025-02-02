@@ -108,7 +108,7 @@ int	check_built(char *s)
 
 }
 
-void	exec_cmd(char *av[], t_data *data)
+int	exec_cmd(char *av[], t_data *data)
 {
 	char	*path;
 
@@ -122,11 +122,12 @@ void	exec_cmd(char *av[], t_data *data)
 		if (execve(path, av, data->env) == -1)
 		{
 			perror("execve failed");
+			if (data->infile != STDIN_FILENO)
+				close(data->infile); 
+   			 if (data->outfile != STDOUT_FILENO)
+        		close(data->outfile);
 			exit (127);
 		}
 	}
-	if (data->infile != STDIN_FILENO)
-        close(data->infile); 
-    if (data->outfile != STDOUT_FILENO)
-        close(data->outfile);
+	return (-1);
 }
