@@ -23,7 +23,6 @@ void	dl(t_parse **parse_result, t_data *data, char *av[])
 			perror("dup2");
 		close(data->infile);
 	}
-
 }
 
 void	sr(t_parse **parse_result, t_data *data)
@@ -54,7 +53,7 @@ void	dr(t_parse **parse_result, t_data *data)
 	}
 }
 
-int	ft_ope(t_parse **parse_result, t_data *data, char *av[], int *cmd_index)
+int	ft_ope(t_parse **parse_result, t_data *data, char *av[], int cmd_index)
 {
 	if ((*parse_result)->type == SR)
 		sr(parse_result, data);
@@ -64,7 +63,7 @@ int	ft_ope(t_parse **parse_result, t_data *data, char *av[], int *cmd_index)
 		sl(parse_result, data);
 	else if ((*parse_result)->type == DL)
 	{
-		av[*cmd_index] = NULL;
+		av[cmd_index] = NULL;
 		dl(parse_result, data, av);
 	}
 	return (1);

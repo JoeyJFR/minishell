@@ -1,13 +1,12 @@
 #include "mini_exec.h"
 
-
 void	child(char *av[], t_data *data, int fd[])
 {
 	close(fd[0]);
 	if (data->infile != 0)
 	{
 		if (dup2(data->infile, STDIN_FILENO) == -1)
-				perror("dup2");
+			perror("dup2");
 		close(data->infile);
 	}
 	dup2(fd[1], STDOUT_FILENO);

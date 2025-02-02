@@ -62,6 +62,7 @@ void	ft_putstr_fd(char *s, int fd)
 	l = ft_strlen(s);
 	write(fd, s, l);
 }
+
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	size_t	i;
@@ -76,6 +77,7 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	}
 	return (0);
 }
+
 size_t	ft_strlen(const char *str)
 {
 	size_t	i;

@@ -105,7 +105,6 @@ int	check_built(char *s)
 	else if (!ft_strcmp(s, "exit"))
 		return (1);
 	return (0);
-
 }
 
 int	exec_cmd(char *av[], t_data *data)
@@ -123,9 +122,9 @@ int	exec_cmd(char *av[], t_data *data)
 		{
 			perror("execve failed");
 			if (data->infile != STDIN_FILENO)
-				close(data->infile); 
-   			 if (data->outfile != STDOUT_FILENO)
-        		close(data->outfile);
+				close(data->infile);
+			if (data->outfile != STDOUT_FILENO)
+				close(data->outfile);
 			exit (127);
 		}
 	}

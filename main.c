@@ -1,4 +1,3 @@
-
 #include "mini_exec.h"
 
 char	*set_prompt(void)
@@ -31,7 +30,6 @@ int	main(int argc, char *argv[], char *env[])
 	while (1)
 	{
 		//check signal, if signal control C , just print path, or D, I free space, exit, control \ do nothing
-		
 		rl = readline(cwd);
 		// if (rl == NULL)
 		// {
@@ -42,7 +40,7 @@ int	main(int argc, char *argv[], char *env[])
 		// }
 		add_history(rl);
 		// /wait from Vincent's work
-		parse_result = parsing(rl);  
+		parse_result = parsing(rl);
 		// t_parse	*temp = parse_result;
 		// while (temp)
 		// {
@@ -63,7 +61,8 @@ int	main(int argc, char *argv[], char *env[])
 		}
 		data.env = env;
 		if (exec(parse_result, &data) == -1)
-		{	printf("error in exec.\n");
+		{
+			printf("error in exec.\n");
 			//free t_parse struct
 			exit (-1);
 		}

@@ -9,6 +9,10 @@
 # include <fcntl.h>
 # include <sys/wait.h>
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 100
+# endif
+
 typedef enum s_type
 {
 	ARG,
@@ -28,7 +32,6 @@ typedef struct s_parse
 	struct s_parse	*prev;
 	struct s_parse	*next;
 }	t_parse;
-
 
 typedef enum e_error
 {
@@ -58,7 +61,8 @@ char	*ft_strjoin_cwd(char *s1, char *s2);
 t_parse	*parsing(char *str);
 int		check_env(char *env[]);
 int		exec(t_parse *parse_result, t_data *data);
-int		ft_ope(t_parse **parse_result, t_data *data, char *av[], int *cmd_index);
+int		ft_ope(t_parse **parse_result, t_data *data, \
+				char *av[], int cmd_index);
 void	handle_pipe(char *av[], t_data *data, int fd[]);
 int		exec_cmd(char *av[], t_data *data);
 int		ft_strcmp(const char *s1, const char *s2);
@@ -66,7 +70,7 @@ void	ft_putstr_fd(char *s, int fd);
 void	handle_heredoc(t_parse *parse_result, t_data *data);
 t_parse	*mini_lstnew(char *str);
 void	mini_lstadd_back(t_parse **lst, t_parse *new);
-void 	mini_error(char *str, int status);
+void	mini_error(char *str, int status);
 size_t	ft_strlen(const char *str);
 
 int		check_arg(char *arg, t_data *data);

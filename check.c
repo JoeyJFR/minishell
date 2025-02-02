@@ -49,20 +49,13 @@ int	check_arg(char *arg, t_data *data)
 		i++;
 	env_paths = ft_split(data->env[i] + 5, ':');
 	if (!env_paths)
-	{
-		printf("failed to split path due to Malloc.\n");
 		return (-1);
-	}
 	i = -1;
 	while (env_paths[++i])
 	{
 		cmd_to_exec = ft_strjoin1(env_paths[i], arg);
 		if (!cmd_to_exec)
-		{
-			ft_free(env_paths);
-			printf("failed to combine for program due to Malloc.\n");
-			return (-1);
-		}
+			return (ft_free(env_paths), -1);
 		if (access(cmd_to_exec, X_OK) == 0)
 		{
 			ft_free(env_paths);
@@ -70,6 +63,5 @@ int	check_arg(char *arg, t_data *data)
 			return (1);
 		}
 	}
-	ft_free(env_paths);
-	return (0);
+	return (ft_free(env_paths), 0);
 }

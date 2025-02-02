@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: joeyj <joeyj@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zjiang <zjiang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 15:04:26 by zjiang            #+#    #+#             */
-/*   Updated: 2025/01/30 17:37:08 by joeyj            ###   ########.fr       */
+/*   Updated: 2025/02/02 11:28:03 by zjiang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,5 +114,5 @@ char	**ft_split(char const *s, char c)
 		return (ptr);
 	}
 	ptr[seg] = NULL;
-	return (ptr);	
+	return (ptr);
 }
