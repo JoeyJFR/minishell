@@ -17,7 +17,7 @@ int	exec(t_parse *parse_result, t_data *data)
 		if (parse_result->type == ARG)
 			av[cmd_index++] = parse_result->str;
 		else if (parse_result->type == SL || parse_result->type == DL || parse_result->type == SR || parse_result->type == DR)
-			ft_ope(&parse_result, data);
+			ft_ope(&parse_result, data, av, &cmd_index);
 		else if (parse_result->type == PIPE)
 		{
 			av[cmd_index] = NULL;
@@ -59,9 +59,9 @@ int	exec(t_parse *parse_result, t_data *data)
 			return (1);
 		}
 	}
-	if (data->infile != STDIN_FILENO)
+	if (data->infile != 0)
         close(data->infile);
-    if (data->outfile != STDOUT_FILENO)
+    if (data->outfile != 1)
         close(data->outfile);
 	return (0);
 }
