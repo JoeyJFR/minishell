@@ -78,6 +78,8 @@ int	exec(t_parse *parse_result, t_data *data)
 			return (1);
 		}
 	}
+	while (wait(NULL) > 0)
+		;
 	if (data->infile != 0)
 		close(data->infile);
 	if (data->outfile != 1)

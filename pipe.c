@@ -24,8 +24,9 @@ void	handle_pipe(char *av[], t_data *data, int fd[])
 		child(av, data, fd);
 	else if (pid > 0)
 	{
+		close(fd[1]);
 		if (data->outfile != 1)
 			close(data->outfile);
-		waitpid(pid, NULL, 0);
+		data->infile = fd[0];
 	}
 }
