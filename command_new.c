@@ -121,10 +121,10 @@ int	exec_cmd(char *av[], t_data *data)
 		if (execve(path, av, data->env) == -1)
 		{
 			perror("execve failed");
-			if (data->infile != STDIN_FILENO)
-				close(data->infile);
-			if (data->outfile != STDOUT_FILENO)
-				close(data->outfile);
+			if (STDIN_FILENO != 0)
+				close(STDIN_FILENO);
+			if (STDOUT_FILENO != 1)
+				close(STDOUT_FILENO);
 			exit (127);
 		}
 	}

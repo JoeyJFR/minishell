@@ -1,5 +1,5 @@
 #include "mini_exec.h"
-// after the ope, need to redirect them using dup2()
+
 void	sl(t_parse **parse_result, t_data *data)
 {
 	(*parse_result) = (*parse_result)->next;
@@ -9,6 +9,12 @@ void	sl(t_parse **parse_result, t_data *data)
 			data->infile = open((*parse_result)->str, O_RDONLY);
 			if (data->infile == -1)
 				perror("open");
+			if (dup2(data->infile, STDIN_FILENO) == -1)
+			{
+				perror("dup2");
+				return ;
+			}
+			close(data->infile);
 		}
 	}
 }
@@ -32,6 +38,12 @@ void	sr(t_parse **parse_result, t_data *data)
 					O_CREAT | O_WRONLY | O_TRUNC, 0644);
 			if (data->outfile == -1)
 				perror("open");
+			if (dup2(data->outfile, STDOUT_FILENO) == -1)
+			{
+				perror("dup2");
+				return ;
+			}
+			close(data->outfile);
 		}
 	}
 }
@@ -46,6 +58,12 @@ void	dr(t_parse **parse_result, t_data *data)
 					O_CREAT | O_WRONLY | O_APPEND, 0644);
 			if (data->outfile == -1)
 				perror("open");
+			if (dup2(data->outfile, STDOUT_FILENO) == -1)
+			{
+				perror("dup2");
+				return ;
+			}
+			close(data->outfile);
 		}
 	}
 }

@@ -36,6 +36,13 @@ void	handle_heredoc(t_parse *parse_result, t_data *data)
 		return ;
 	}
 	loop_call(parse_result, data, fd);
-	data->infile = fd[0];
+	if (dup2(fd[0], STDIN_FILENO) == -1)
+	{
+		perror("dup2");
+		close(fd[0]);
+		close(fd[1]);
+		return ;
+	}
+	close(fd[0]);
 	close(fd[1]);
 }

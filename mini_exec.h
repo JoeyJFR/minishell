@@ -68,7 +68,7 @@ int		check_env(char *env[]);
 int		exec(t_parse *parse_result, t_data *data);
 int		ft_ope(t_parse **parse_result, t_data *data, \
 				char *av[], int cmd_index);
-void	handle_pipe(char *av[], t_data *data, int fd[]);
+void	handle_pipe(char *av[], t_data *data);
 int		exec_cmd(char *av[], t_data *data);
 int		ft_strcmp(const char *s1, const char *s2);
 void	ft_putstr_fd(char *s, int fd);
