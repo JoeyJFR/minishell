@@ -1,6 +1,6 @@
 #include "mini_exec.h"
 
-void	sl(t_parse **parse_result, t_data *data)
+int	sl(t_parse **parse_result, t_data *data)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
@@ -8,27 +8,37 @@ void	sl(t_parse **parse_result, t_data *data)
 		{
 			data->infile = open((*parse_result)->str, O_RDONLY);
 			if (data->infile == -1)
+			{
 				perror("open");
+				data->open_in_fail = 1;
+				return (0);
+			}
 			if (dup2(data->infile, STDIN_FILENO) == -1)
 			{
 				perror("dup2");
-				return ;
+				close(data->infile);
+				return (1);
 			}
 			close(data->infile);
 		}
 	}
+	return (0);
 }
 
-void	dl(t_parse **parse_result)
+int	dl(t_parse **parse_result)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
 		if (*parse_result && (*parse_result)->type == ARG)
-			handle_heredoc(*parse_result);
+		{
+			if (handle_heredoc(*parse_result))
+				return (1);
+		}
 	}
+	return (0);
 }
 
-void	sr(t_parse **parse_result, t_data *data)
+int	sr(t_parse **parse_result, t_data *data)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
@@ -37,18 +47,24 @@ void	sr(t_parse **parse_result, t_data *data)
 			data->outfile = open((*parse_result)->str, \
 					O_CREAT | O_WRONLY | O_TRUNC, 0644);
 			if (data->outfile == -1)
+			{
 				perror("open");
+				data->open_out_fail = 1;
+				return (0);
+			}
 			if (dup2(data->outfile, STDOUT_FILENO) == -1)
 			{
 				perror("dup2");
-				return ;
+				close(data->outfile);
+				return (1);
 			}
 			close(data->outfile);
 		}
 	}
+	return (0);
 }
 
-void	dr(t_parse **parse_result, t_data *data)
+int	dr(t_parse **parse_result, t_data *data)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
@@ -57,29 +73,34 @@ void	dr(t_parse **parse_result, t_data *data)
 			data->outfile = open((*parse_result)->str, \
 					O_CREAT | O_WRONLY | O_APPEND, 0644);
 			if (data->outfile == -1)
+			{
 				perror("open");
+				data->open_out_fail = 1;
+				return (0);
+			}
 			if (dup2(data->outfile, STDOUT_FILENO) == -1)
 			{
 				perror("dup2");
-				return ;
+				close(data->outfile);
+				return (1);
 			}
 			close(data->outfile);
 		}
 	}
+	return (0);
 }
 
 int	ft_ope(t_parse **parse_result, t_data *data, char *av[], int cmd_index)
 {
 	if ((*parse_result)->type == SR)
-		sr(parse_result, data);
+		return (sr(parse_result, data));
 	else if ((*parse_result)->type == DR)
-		dr(parse_result, data);
+		return (dr(parse_result, data));
 	else if ((*parse_result)->type == SL)
-		sl(parse_result, data);
-	else if ((*parse_result)->type == DL)
+		return (sl(parse_result, data));
+	else
 	{
 		av[cmd_index] = NULL;
-		dl(parse_result);
+		return (dl(parse_result));
 	}
-	return (1);
 }

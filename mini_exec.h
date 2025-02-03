@@ -54,13 +54,14 @@ typedef struct s_data
 	char	**env;
 	char	*cmd;
 	t_parse	*cmd_pos;
-	int		here_doc;
 	pid_t	*pid;
 	int		pid_nb;
 	int		infile;
 	int		outfile;
 	int		stdin_backup;
 	int		stdout_backup;
+	int		open_in_fail;
+	int		open_out_fail;
 }	t_data;
 
 char	*ft_strjoin_cwd(char *s1, char *s2);
@@ -69,17 +70,17 @@ int		check_env(char *env[]);
 int		exec(t_parse *parse_result, t_data *data);
 int		ft_ope(t_parse **parse_result, t_data *data, \
 				char *av[], int cmd_index);
-void	handle_pipe(char *av[], t_data *data);
+int		handle_pipe(char *av[], t_data *data);
 int		exec_cmd(char *av[], t_data *data);
 int		ft_strcmp(const char *s1, const char *s2);
 void	ft_putstr_fd(char *s, int fd);
-void	handle_heredoc(t_parse *parse_result);
+int		handle_heredoc(t_parse *parse_result);
 t_parse	*mini_lstnew(char *str);
 void	mini_lstadd_back(t_parse **lst, t_parse *new);
 void	mini_error(char *str, int status);
 size_t	ft_strlen(const char *str);
 int		count_pid(t_parse *parse_result);
-int		wait_dup(t_data *data);
+int		wait_dup_free(t_data *data);
 
 int		check_arg(char *arg, t_data *data);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);

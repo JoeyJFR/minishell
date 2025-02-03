@@ -6,7 +6,7 @@
 #    By: zjiang <zjiang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/07 13:27:04 by zjiang            #+#    #+#              #
-#    Updated: 2025/02/03 14:26:56 by zjiang           ###   ########.fr        #
+#    Updated: 2025/02/03 14:54:55 by zjiang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ CFLAGS = -Wall -Wextra -Werror
 
 all: $(NAME)
 
-$(NAME): $(OBJS) Makefile
+$(NAME): $(OBJS) Makefile mini_exec.h libft.h
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -lreadline
 	
 $(OBJ_DIR)/%.o: %.c | $(OBJ_DIR)
