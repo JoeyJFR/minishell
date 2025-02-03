@@ -27,28 +27,6 @@ static void	mid_exec(t_parse **p_result, int *cmd_i, char *av[], t_data *data)
 		av[(*cmd_i)++] = (*p_result)->str;
 }
 
-static int	last_cmd(int fd[], t_data *data, char *av[])
-{
-	pid_t	pid;
-
-	pipe(fd);
-	pid = fork();
-	if (pid == 0)
-	{
-		if (exec_cmd(av, data) == -1)
-		{
-			perror("execute");
-			return (1);
-		}
-	}
-	close(fd[1]);
-	if (data->outfile != 1)
-		close(data->outfile);
-	data->infile = fd[0];
-	(data->pid)[data->pid_nb++] = pid;
-	return (0);
-}
-
 static int	last_exec(char *av[], int cmd_index, t_data *data)
 {
 	pid_t	pid;

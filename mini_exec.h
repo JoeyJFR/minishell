@@ -72,12 +72,12 @@ void	handle_pipe(char *av[], t_data *data);
 int		exec_cmd(char *av[], t_data *data);
 int		ft_strcmp(const char *s1, const char *s2);
 void	ft_putstr_fd(char *s, int fd);
-void	handle_heredoc(t_parse *parse_result, t_data *data);
+void	handle_heredoc(t_parse *parse_result);
 t_parse	*mini_lstnew(char *str);
 void	mini_lstadd_back(t_parse **lst, t_parse *new);
 void	mini_error(char *str, int status);
 size_t	ft_strlen(const char *str);
-int	count_pid(t_parse *parse_result);
+int		count_pid(t_parse *parse_result);
 
 int		check_arg(char *arg, t_data *data);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);

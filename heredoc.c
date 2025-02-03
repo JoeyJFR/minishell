@@ -1,6 +1,6 @@
 #include "mini_exec.h"
 
-static	int	loop_call(t_parse *parse_result, t_data *data, int fd[])
+static	int	loop_call(t_parse *parse_result, int fd[])
 {
 	char	*s;
 
@@ -26,7 +26,7 @@ static	int	loop_call(t_parse *parse_result, t_data *data, int fd[])
 	return (0);
 }
 
-void	handle_heredoc(t_parse *parse_result, t_data *data)
+void	handle_heredoc(t_parse *parse_result)
 {
 	int		fd[2];
 
@@ -35,7 +35,7 @@ void	handle_heredoc(t_parse *parse_result, t_data *data)
 		perror("pipe");
 		return ;
 	}
-	loop_call(parse_result, data, fd);
+	loop_call(parse_result, fd);
 	if (dup2(fd[0], STDIN_FILENO) == -1)
 	{
 		perror("dup2");

@@ -27,6 +27,8 @@ int	main(int argc, char *argv[], char *env[])
 	t_parse	*parse_result;
 	pid_t	pid;
 
+	(void)argv;
+	(void)argc;
 	cwd = set_prompt();
 	while (1)
 	{

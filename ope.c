@@ -19,12 +19,12 @@ void	sl(t_parse **parse_result, t_data *data)
 	}
 }
 
-void	dl(t_parse **parse_result, t_data *data, char *av[])
+void	dl(t_parse **parse_result)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
 		if (*parse_result && (*parse_result)->type == ARG)
-			handle_heredoc(*parse_result, data);
+			handle_heredoc(*parse_result);
 	}
 }
 
@@ -79,7 +79,7 @@ int	ft_ope(t_parse **parse_result, t_data *data, char *av[], int cmd_index)
 	else if ((*parse_result)->type == DL)
 	{
 		av[cmd_index] = NULL;
-		dl(parse_result, data, av);
+		dl(parse_result);
 	}
 	return (1);
 }
