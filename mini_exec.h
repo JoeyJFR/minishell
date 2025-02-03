@@ -54,12 +54,11 @@ typedef struct s_data
 	char	**env;
 	char	*cmd;
 	t_parse	*cmd_pos;
-	int		infile;
-	int		outfile;
-	int		fd[2];
 	int		here_doc;
 	pid_t	*pid;
 	int		pid_nb;
+	int		stdin_backup;
+	int		stdout_backup;
 }	t_data;
 
 char	*ft_strjoin_cwd(char *s1, char *s2);
@@ -78,6 +77,7 @@ void	mini_lstadd_back(t_parse **lst, t_parse *new);
 void	mini_error(char *str, int status);
 size_t	ft_strlen(const char *str);
 int		count_pid(t_parse *parse_result);
+int		wait_dup(t_data *data);
 
 int		check_arg(char *arg, t_data *data);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);

@@ -41,6 +41,8 @@ static int	last_exec(char *av[], int cmd_index, t_data *data)
 			return (1);
 		}
 	}
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
 	(data->pid)[data->pid_nb++] = pid;
 	return (0);
 }
@@ -48,14 +50,11 @@ static int	last_exec(char *av[], int cmd_index, t_data *data)
 int	exec(t_parse *parse_result, t_data *data)
 {
 	char	*av[BUFFER_SIZE];
-	int		stdin_backup;
-	int		stdout_backup;
 	int		cmd_index;
 	int		i;
 
-	stdin_backup = dup(STDIN_FILENO);
-	stdout_backup = dup(STDOUT_FILENO);
-
+	data->stdin_backup = dup(STDIN_FILENO);
+	data->stdout_backup = dup(STDOUT_FILENO);
 	data->pid_nb = count_pid(parse_result);
 	data->pid = malloc((sizeof(pid_t) * data->pid_nb));
 	if (!data->pid)
@@ -77,11 +76,8 @@ int	exec(t_parse *parse_result, t_data *data)
 	i = 0;
 	while (i < data->pid_nb)
 		waitpid(data->pid[i++], NULL, 0);
-	if (STDIN_FILENO != 0)
-		close(STDIN_FILENO);
-	if (STDOUT_FILENO != 1)
-		close(STDOUT_FILENO);
-	dup2(stdin_backup, STDIN_FILENO);
-	dup2(stdout_backup, STDOUT_FILENO);
+	dup2(data->stdin_backup, STDIN_FILENO);
+	dup2(data->stdout_backup, STDOUT_FILENO);
+	free(data->pid);
 	return (0);
 }

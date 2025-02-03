@@ -6,16 +6,17 @@
 #    By: zjiang <zjiang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/07 13:27:04 by zjiang            #+#    #+#              #
-#    Updated: 2025/02/03 12:33:52 by zjiang           ###   ########.fr        #
+#    Updated: 2025/02/03 14:26:56 by zjiang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = check.c command.c exec.c ft_split.c get_next_line_utils.c get_next_line.c heredoc.c main.c mini_lst.c mini_utils.c ope.c parsing.c pipe.c utils1.c
+SRCS = check.c command.c exec.c ft_split.c get_next_line_utils.c get_next_line.c \
+heredoc.c main.c mini_lst.c mini_utils.c ope.c parsing.c pipe.c utils1.c utils2.c
 
 OBJ_DIR = obj
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 
-NAME = minishell
+NAME = shell
 
 MAKE = make
 CC = cc
