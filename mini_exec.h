@@ -57,6 +57,8 @@ typedef struct s_data
 	int		here_doc;
 	pid_t	*pid;
 	int		pid_nb;
+	int		infile;
+	int		outfile;
 	int		stdin_backup;
 	int		stdout_backup;
 }	t_data;
