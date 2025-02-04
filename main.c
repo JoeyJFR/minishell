@@ -8,13 +8,13 @@ char	*set_prompt(void)
 	if (!cwd)
 	{
 		perror("getcwd");
-		exit (1);
+		exit (get_error_code());
 	}
 	cwd = ft_strjoin_cwd(cwd, " > ");
 	if (!cwd)
 	{
-		perror("malloc when strjoin");
-		exit (1);
+		perror("malloc when strjoin cwd");
+		exit (get_error_code());
 	}
 	return (cwd);
 }
@@ -29,9 +29,9 @@ int	main(int argc, char *argv[], char *env[])
 
 	(void)argv;
 	(void)argc;
-	cwd = set_prompt();
 	while (1)
 	{
+		cwd = set_prompt();
 		//check signal, if signal control C , just print path, or D, I free space, exit, control \ do nothing
 		rl = readline(cwd);
 		// if (rl == NULL)
@@ -57,34 +57,34 @@ int	main(int argc, char *argv[], char *env[])
 			free(cwd);
 			return (1);
 		}
+		if (check_cd_exp_un_ex(parse_result))
+		{
+			cd_exp_un_ex(parse_result);
+			free(cwd);
+			continue ;
+		}
 		if (check_env(env))
 		{
 			printf("error in environment.\n");
-			return (1);
+			continue ;
 		}
 		data.env = env;
 		pid = fork();
 		if (pid == -1)
 		{
-			perror("fork");
-			return (1);
+			perror("fork in main loop");
+			exit (get_error_code());
 		}
 		if (pid == 0)
 		{
-			//exec in child process
-			if (exec(parse_result, &data) == -1)
-			{
-				printf("error in exec.\n");
-				//free t_parse struct
-				exit (-1);
-			}
+			free(cwd);
+			exit(exec(parse_result, &data));
 		}
 		else
-		{
 			waitpid(pid, NULL, 0);
-		}
+		free(cwd);
+		free_parse(parse_result);
 	}
-	free(cwd);
 	rl_clear_history();
 	//free t_parse struct;
 	return (0);

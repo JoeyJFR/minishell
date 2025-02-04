@@ -32,13 +32,13 @@ int	handle_heredoc(t_parse *parse_result)
 
 	if (pipe(fd) == -1)
 	{
-		perror("pipe");
+		perror("pipe in here_doc");
 		return (1);
 	}
 	loop_call(parse_result, fd);
 	if (dup2(fd[0], STDIN_FILENO) == -1)
 	{
-		perror("dup2");
+		perror("dup2 in here_doc");
 		close(fd[0]);
 		close(fd[1]);
 		return (1);

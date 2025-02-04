@@ -9,13 +9,13 @@ int	sl(t_parse **parse_result, t_data *data)
 			data->infile = open((*parse_result)->str, O_RDONLY);
 			if (data->infile == -1)
 			{
-				perror("open");
+				perror("open in sl");
 				data->open_in_fail = 1;
 				return (0);
 			}
 			if (dup2(data->infile, STDIN_FILENO) == -1)
 			{
-				perror("dup2");
+				perror("dup2 in sl");
 				close(data->infile);
 				return (1);
 			}
@@ -48,13 +48,13 @@ int	sr(t_parse **parse_result, t_data *data)
 					O_CREAT | O_WRONLY | O_TRUNC, 0644);
 			if (data->outfile == -1)
 			{
-				perror("open");
+				perror("open in sr");
 				data->open_out_fail = 1;
 				return (0);
 			}
 			if (dup2(data->outfile, STDOUT_FILENO) == -1)
 			{
-				perror("dup2");
+				perror("dup2 in sr");
 				close(data->outfile);
 				return (1);
 			}
@@ -74,13 +74,13 @@ int	dr(t_parse **parse_result, t_data *data)
 					O_CREAT | O_WRONLY | O_APPEND, 0644);
 			if (data->outfile == -1)
 			{
-				perror("open");
+				perror("open in dr");
 				data->open_out_fail = 1;
 				return (0);
 			}
 			if (dup2(data->outfile, STDOUT_FILENO) == -1)
 			{
-				perror("dup2");
+				perror("dup2 in dr");
 				close(data->outfile);
 				return (1);
 			}

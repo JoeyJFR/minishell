@@ -11,7 +11,7 @@ static	char	*ft_strjoin1(char const *s1, char const *s2)
 	i = ft_strlen(s1) + ft_strlen(s2);
 	ptr = (char *)malloc((i + 2) * sizeof(char));
 	if (!ptr)
-		return (NULL);
+		return (perror("malloc in strjoin1"), NULL);
 	i = 0;
 	j = 0;
 	while (s1[i])
@@ -48,7 +48,7 @@ static	char	*find_path(char *cmd, char *env[])
 		i++;
 	env_paths = ft_split(env[i] + 5, ':');
 	if (!env_paths)
-		return (NULL);
+		return (perror("fail to split env"), NULL);
 	i = -1;
 	while (env_paths[++i])
 	{
@@ -66,67 +66,33 @@ static	char	*find_path(char *cmd, char *env[])
 	return (NULL);
 }
 
-// static	void	free_cmd(t_data *data, char *path, char **args)
-// {
-// 	int	i;
-
-// 	if (data->pipe_fds)
-// 		free(data->pipe_fds);
-// 	if (data->pid)
-// 		free(data->pid);
-// 	if (path)
-// 		free(path);
-// 	i = 0;
-// 	if (args)
-// 	{
-// 		while (args[i])
-// 		{
-// 			free(args[i]);
-// 			i++;
-// 		}
-// 		free(args);
-// 	}
-// }
-
-int	check_built(char *s)
+int	check_built_child(char *s)
 {
 	if (!ft_strcmp(s, "echo"))
 		return (1);
-	else if (!ft_strcmp(s, "cd"))
-		return (1);
 	else if (!ft_strcmp(s, "pwd"))
 		return (1);
-	else if (!ft_strcmp(s, "export"))
-		return (1);
-	else if (!ft_strcmp(s, "unset"))
-		return (1);
 	else if (!ft_strcmp(s, "env"))
-		return (1);
-	else if (!ft_strcmp(s, "exit"))
 		return (1);
 	return (0);
 }
 
-int	exec_cmd(char *av[], t_data *data)
+void	exec_cmd(char *av[], t_data *data)
 {
 	char	*path;
 
 	if (av[0][0] == '/')
-		execve(av[0], av, data->env);
-	// else if (check_built(av[0]))
-	// 	ft_built(av, data);
+	{
+		if (execve(av[0], av, data->env) == -1)
+			handle_execve_fail(data, NULL);
+	}
+	else if (check_built_child(av[0]))
+		ft_built(av, data);
 	else
 	{
 		path = find_path(av[0], data->env);
 		if (execve(path, av, data->env) == -1)
-		{
-			perror("execve failed");
-			if (STDIN_FILENO != 0)
-				close(STDIN_FILENO);
-			if (STDOUT_FILENO != 1)
-				close(STDOUT_FILENO);
-			exit (127);
-		}
+			handle_execve_fail(data, path);
 	}
-	return (-1);
+	return ;
 }

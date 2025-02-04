@@ -1,3 +1,4 @@
+
 #ifndef MINI_EXEC_H
 # define MINI_EXEC_H
 
@@ -8,6 +9,7 @@
 # include <readline/history.h>
 # include <fcntl.h>
 # include <sys/wait.h>
+# include <errno.h>
 
 //ARG_MAX = 2097152 bytes
 # ifndef BUFFER_SIZE
@@ -71,7 +73,7 @@ int		exec(t_parse *parse_result, t_data *data);
 int		ft_ope(t_parse **parse_result, t_data *data, \
 				char *av[], int cmd_index);
 int		handle_pipe(char *av[], t_data *data);
-int		exec_cmd(char *av[], t_data *data);
+void	exec_cmd(char *av[], t_data *data);
 int		ft_strcmp(const char *s1, const char *s2);
 void	ft_putstr_fd(char *s, int fd);
 int		handle_heredoc(t_parse *parse_result);
@@ -80,12 +82,28 @@ void	mini_lstadd_back(t_parse **lst, t_parse *new);
 void	mini_error(char *str, int status);
 size_t	ft_strlen(const char *str);
 int		count_pid(t_parse *parse_result);
-int		wait_dup_free(t_data *data);
+int		wait_dup_free(t_data *data, t_parse *parse_result);
+int		get_error_code(void);
+void	handle_execve_fail(t_data *data, char *path);
+void	ft_built(char *av[], t_data *data);
+void	ft_echo(char *av[], t_data *data);
+void	free_parse(t_parse *p);
+void	cd_exp_un_ex(t_parse *parse_result);
+void	check_b_cd(t_parse *parse_result);
+int		check_cd_exp_un_ex(t_parse *parse_result);
+void	check_b_pwd(char *av[]);
+void	check_b_env(char *av[], t_data *data);
+
+
+
 
 int		check_arg(char *arg, t_data *data);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 char	**ft_split(char const *str, char c);
 char	*get_next_line(int fd);
 size_t	ft_strlen(const char *s);
+
+
+
 
 #endif
