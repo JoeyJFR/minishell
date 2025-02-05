@@ -37,19 +37,21 @@ void	ft_putstr_fd(char *s, int fd)
 
 void	reform_env(t_env *env, char *environ[])
 {
-	int	i;
+	int		i;
+	t_env	*temp;
 
+	temp = env;
 	i = 0;
-	while (env)
+	while (temp)
 	{
-		environ[i] = env->str;
+		environ[i] = temp->str;
 		i++;
-		env = env->next;
+		temp = temp->next;
 	}
 	environ[i] = NULL;
 }
 
-void	handle_execve_fail(t_data *data, char *path)
+void	handle_execve_fail(t_data *data, char *path, t_env *env_head)
 {
 	perror("execve failed");
 	if (STDIN_FILENO != 0)
@@ -59,10 +61,12 @@ void	handle_execve_fail(t_data *data, char *path)
 	free(data->pid);
 	if (path)
 		free(path);
+	free_env(env_head);
+	free_parse(data->p_head);
 	exit (127);
 }
 
-int	wait_dup_free(t_data *data, t_parse *parse_result)
+int	wait_dup_free(t_data *data, t_env *env_head)
 {
 	int		i;
 
@@ -71,8 +75,10 @@ int	wait_dup_free(t_data *data, t_parse *parse_result)
 		waitpid(data->pid[i++], NULL, 0);
 	if (data->pid)
 		free(data->pid);
-	if (parse_result)
-		free_parse(parse_result);
+	if (data->p_head)
+		free_parse(data->p_head);
+	if (env_head)
+		free_env(env_head);
 	return (0);
 }
 

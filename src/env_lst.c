@@ -61,7 +61,9 @@ void	free_env(t_env *env)
 	{
 		tmp = env;
 		env = env->next;
-		free(tmp->str);
-		free(tmp);
+		if (tmp->str)
+			free(tmp->str);
+		if (tmp)
+			free(tmp);
 	}
 }

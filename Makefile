@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g3
 SRCDIRS = src src/execution src/parsing
 SRC = $(wildcard $(addsuffix /*.c, $(SRCDIRS))) # Find all .c files
 OBJ = $(SRC:.c=.o) # Convert .c filenames to .o

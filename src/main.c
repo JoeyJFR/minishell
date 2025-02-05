@@ -28,8 +28,7 @@ int main(int ac, char **av, char **env)
 		parse_result = parsing(str, env_head);
 		free(str);
 		if (parse_result == NULL)
-			return (printf("fail to parse.\n"), free_env(env_head), 1);
-
+			return (free(str), printf("fail to parse.\n"), free_env(env_head), 1);
 		if (check_cd_exp_un_ex(parse_result))
 		{
 			cd_exp_un_ex(parse_result, env_head);
@@ -50,11 +49,12 @@ int main(int ac, char **av, char **env)
 			exit (get_error_code());
 		}
 		if (pid == 0)
-			exec(parse_result, &data);
+			exit(exec(parse_result, &data, env_head));
 		else
 			waitpid(pid, NULL, 0);
 		free_parse(parse_result);
 	}
 	free_env(env_head);
+	rl_clear_history();
 	return (0);
 }

@@ -46,13 +46,14 @@ typedef struct s_env
 typedef struct s_data
 {
 	char	*env[BUFFER_SIZE];
-	t_parse	*cmd_pos;
 	pid_t	*pid;
 	int		pid_nb;
 	int		open_in_fail;
 	int		open_out_fail;
 	int		infile;
 	int		outfile;
+	int		cmd_index;
+	t_parse	*p_head;
 }	t_data;
 
 //main
@@ -62,7 +63,7 @@ void	free_env(t_env *env);
 int		check_cd_exp_un_ex(t_parse *parse_result);
 void	cd_exp_un_ex(t_parse *parse_result, t_env *env_head);
 int		check_env(t_env *env_head);
-int		exec(t_parse *parse_result, t_data *data);
+int		exec(t_parse *parse_result, t_data *data, t_env *env_head);
 
 //parse_env
 t_env	*env_lstnew(char *str);
@@ -90,20 +91,19 @@ int		ft_ope(t_parse **parse_result, t_data *data, char *av[], int cmd_index);
 int		handle_heredoc(t_parse *parse_result);
 char	*get_next_line(int fd);
 void	ft_putstr_fd(char *s, int fd);
-int		handle_pipe(char *av[], t_data *data);
-int		exec(t_parse *parse_result, t_data *data);
+int		handle_pipe(char *av[], t_data *data, t_env *env_head);
 void	reform_env(t_env *env, char *environ[]);
-void	handle_execve_fail(t_data *data, char *path);
+void	handle_execve_fail(t_data *data, char *path, t_env *env_head);
 char	**ft_split(char const *s, char c);
-void	exec_cmd(char *av[], t_data *data);
-void	ft_built(char *av[], t_data *data);
-void	ft_echo(char *av[], t_data *data);
+void	exec_cmd(char *av[], t_data *data, t_env *env_head);
+void	ft_built(char *av[], t_data *data, t_env *env_head);
+void	ft_echo(char *av[]);
 void	check_b_pwd(char *av[]);
 void	check_b_env(char *av[], t_data *data);
 int		get_error_code(void);
 void	print_equal(char *s, char *pos);
 void	print_space(char *s);
-int		wait_dup_free(t_data *data, t_parse *parse_result);
+int		wait_dup_free(t_data *data, t_env *env_head);
 
 
 char	*ft_strjoin_gnl(char **head, char **end);
