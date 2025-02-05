@@ -1,4 +1,4 @@
-#include "mini_exec.h"
+#include "../../minishell.h"
 
 static	void	loop_call(t_parse *parse_result, int fd[])
 {

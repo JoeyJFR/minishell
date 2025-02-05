@@ -1,4 +1,4 @@
-#include "mini_exec.h"
+#include "../../minishell.h"
 
 void	child(char *av[], t_data *data, int fd[])
 {
@@ -50,18 +50,4 @@ int	handle_pipe(char *av[], t_data *data)
 	close (fd[0]);
 	(data->pid)[data->pid_nb++] = pid;
 	return (0);
-}
-
-int	count_pid(t_parse *parse_result)
-{
-	int	i;
-
-	i = 1;
-	while (parse_result)
-	{
-		if (parse_result->type == PIPE)
-			i++;
-		parse_result = parse_result->next;
-	}
-	return (i);
 }

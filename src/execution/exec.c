@@ -1,18 +1,13 @@
-#include "mini_exec.h"
+#include "../../minishell.h"
 
-static int	exec_init(int *cmd_index, t_data *data, char *av[], t_parse *parse_result)
+static int	exec_init(int *cmd_index, t_data *data, \
+					char *av[], t_parse *parse_result)
 {
 	*cmd_index = 0;
 	av[0] = NULL;
 	data->pid_nb = 0;
 	data->open_in_fail = 0;
 	data->open_out_fail = 0;
-	data->stdin_backup = dup(STDIN_FILENO);
-	if (data->stdin_backup < 0)
-		return (perror("dup for stdin"), 1);
-	data->stdout_backup = dup(STDOUT_FILENO);
-	if (data->stdout_backup < 0)
-		return (perror("dup for stdout"), 1);
 	data->pid_nb = count_pid(parse_result);
 	data->pid = malloc((sizeof(pid_t) * data->pid_nb));
 	if (!data->pid)
@@ -33,14 +28,14 @@ static int	mid_exec(t_parse **p_result, int *cmd_i, char *av[], t_data *data)
 			return (1);
 		return (0);
 	}
-	else if ((*p_result)->type == PIPE)
+	else if ((*p_result)->type == PI)
 	{
 		av[*cmd_i] = NULL;
 		if (handle_pipe(av, data))
 			return (1);
 		*cmd_i = 0;
 	}
-	else if ((*p_result)->type == ABS_PATH)
+	else if ((*p_result)->type == ABS)
 		av[(*cmd_i)++] = (*p_result)->str;
 	else
 		av[(*cmd_i)++] = (*p_result)->str;

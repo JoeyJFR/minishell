@@ -1,4 +1,4 @@
-#include "mini_exec.h"
+#include "../minishell.h"
 
 t_parse	*mini_lstnew(char *str)
 {
@@ -52,5 +52,15 @@ void	mini_lstadd_back(t_parse **lst, t_parse *new)
 	}
 }
 
-// single quote first read de
-// str[0] jusqu a '  puis de \0 jusquau deuxieme '
+void	free_parse(t_parse *parse)
+{
+	t_parse	*tmp;
+
+	while (parse)
+	{
+		tmp = parse;
+		parse = parse->next;
+		free(tmp->str);
+		free(tmp);
+	}
+}

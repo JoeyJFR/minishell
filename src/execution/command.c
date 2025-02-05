@@ -1,4 +1,4 @@
-#include "mini_exec.h"
+#include "../../minishell.h"
 
 static	char	*ft_strjoin1(char const *s1, char const *s2)
 {
@@ -24,7 +24,7 @@ static	char	*ft_strjoin1(char const *s1, char const *s2)
 	return (ptr);
 }
 
-static	void	ft_free(char **s)
+static	void	ft_free_path(char **s)
 {
 	int	i;
 
@@ -55,14 +55,14 @@ static	char	*find_path(char *cmd, char *env[])
 		cmd_to_exec = ft_strjoin1(env_paths[i], cmd);
 		if (!cmd_to_exec)
 		{
-			ft_free(env_paths);
+			ft_free_path(env_paths);
 			return (NULL);
 		}
 		if (access(cmd_to_exec, X_OK) == 0)
-			return (ft_free(env_paths), cmd_to_exec);
+			return (ft_free_path(env_paths), cmd_to_exec);
 		free(cmd_to_exec);
 	}
-	ft_free(env_paths);
+	ft_free_path(env_paths);
 	return (NULL);
 }
 

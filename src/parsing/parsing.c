@@ -1,9 +1,9 @@
-#include "mini_exec.h"
+#include "../../minishell.h"
 
 void	define_type(t_parse *node)
 {
 	if (node->str[0] == '/')
-		node->type = ABS_PATH;
+		node->type = ABS;
 	else if (!ft_strcmp(node->str, "<<"))
 		node->type = DL;
 	else if (!ft_strcmp(node->str, ">>"))
@@ -13,7 +13,7 @@ void	define_type(t_parse *node)
 	else if (!ft_strcmp(node->str, ">"))
 		node->type = SR;
 	else if (!ft_strcmp(node->str, "|"))
-		node->type = PIPE;
+		node->type = PI;
 	else if (!ft_strcmp(node->str, "cd") || !ft_strcmp(node->str, "echo")
 		|| !ft_strcmp(node->str, "export") || !ft_strcmp(node->str, "env")
 		|| !ft_strcmp(node->str, "pwd") || !ft_strcmp(node->str, "unset")
@@ -28,23 +28,17 @@ char	*fill_arg(char **str)
 	char	*arg_str;
 	int		i;
 
-	i = 0;
-	while (str[0][i] && str[0][i] != ' ' && str[0][i] != '$')
-		++i;
+	i = len_word(*str, ' ');
 	arg_str = malloc(sizeof(char) * (i + 1));
 	if (!arg_str)
 		return (NULL);
-	i = -1;
-	while (str[0][++i] && str[0][i] != ' ' && str[0][i] != '$')
-		arg_str[i] = str[0][i];
-	arg_str[i] = '\0';
-	(*str) += i;
+	arg_str = fill_str(str, ' ', arg_str);
 	return (arg_str);
 }
 
 void	skip_blank(char **str)
 {
-	while (**str == ' ' || **str == '\t')
+	while (**str && (**str == ' ' || **str == '\t'))
 		(*str)++;
 }
 
@@ -55,24 +49,41 @@ t_parse	*define_arg(t_parse **list, char **str)
 
 	skip_blank(str);
 	arg_str = fill_arg(str);
-	node = mini_lstnew(arg_str);
-	if (!node)
+	if (!arg_str)
 		return (NULL);
-	mini_lstadd_back(list, node);
-	define_type(node);
+	if (*arg_str)
+	{
+		node = mini_lstnew(arg_str);
+		if (!node)
+			return (free(arg_str), NULL);
+		mini_lstadd_back(list, node);
+		define_type(node);
+	}
 	return (*list);
 }
+/*
+	Remplacer buffer par str en changeant les variables d'env et les quotes
+*/
 
-t_parse	*parsing(char *str)
+t_parse	*parsing(char *buffer, t_env *env)
 {
 	t_parse	*node;
+	char	*str;
+	char	*str_head;
 
 	node = NULL;
+	if (check_quotes(buffer) != -1)
+		return (printf("single quote\n"), NULL);
+	str = convert_var(buffer, env);
+	if (!str)
+		return (NULL);
+	str_head = str;
 	while (*str)
 	{
 		node = define_arg(&node, &str);
 		if (!node)
-			return (mini_error("arg_node", 1), NULL);
+			return (free(str_head), free_parse(node), NULL);
 	}
+	free(str_head);
 	return (node);
 }

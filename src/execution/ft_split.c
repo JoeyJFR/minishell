@@ -1,16 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_split.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: zjiang <zjiang@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/06 15:04:26 by zjiang            #+#    #+#             */
-/*   Updated: 2025/02/02 11:28:03 by zjiang           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "libft.h"
+#include "../../minishell.h"
 
 int	ft_seg(char const *s, char c)
 {
@@ -97,11 +85,9 @@ int	ft_make(char const *s, char c, char **ptr, int seg)
 char	**ft_split(char const *s, char c)
 {
 	int		seg;
-	int		pos;
 	int		flag;
 	char	**ptr;	
 
-	pos = 0;
 	seg = ft_seg(s, c);
 	ptr = (char **)malloc(sizeof(char *) * (seg + 1));
 	if (!ptr)

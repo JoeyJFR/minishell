@@ -1,4 +1,4 @@
-#include "mini_exec.h"
+#include "../../minishell.h"
 
 void	ft_built(char *av[], t_data *data)
 {

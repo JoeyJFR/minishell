@@ -1,4 +1,4 @@
-#include "mini_exec.h"
+#include "../../minishell.h"
 
 int	sl(t_parse **parse_result, t_data *data)
 {
