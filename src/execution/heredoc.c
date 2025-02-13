@@ -1,6 +1,6 @@
 #include "../../minishell.h"
 
-static	void	loop_call(t_parse *parse_result, int fd[])
+static	void	loop_call(t_token *parse_result, int fd[])
 {
 	char	*s;
 
@@ -26,7 +26,7 @@ static	void	loop_call(t_parse *parse_result, int fd[])
 	return ;
 }
 
-int	handle_heredoc(t_parse *parse_result)
+int	handle_heredoc(t_token *parse_result)
 {
 	int		fd[2];
 

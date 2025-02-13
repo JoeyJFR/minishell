@@ -1,24 +1,23 @@
 #include "../../minishell.h"
 
-void	cd_exp_un_ex(t_parse *parse_result, t_env *env_head)
+int	built_in(t_token *token, t_env *env)
 {
-	if (!ft_strcmp(parse_result->str, "cd"))
-		check_b_cd(parse_result);
-	else if (!ft_strcmp(parse_result->str, "exit"))
-		check_b_exit(parse_result, env_head);
-	else if (!ft_strcmp(parse_result->str, "export"))
-		check_b_export(parse_result, env_head);
-}
+	int r_val;
 
-int	check_cd_exp_un_ex(t_parse *parse_result)
-{
-	if (!ft_strcmp(parse_result->str, "cd"))
-		return (1);
-	if (!ft_strcmp(parse_result->str, "export"))
-		return (1);
-	if (!ft_strcmp(parse_result->str, "unset"))
-		return (1);
-	if (!ft_strcmp(parse_result->str, "exit"))
-		return (1);
-	return (0);
+	r_val = 0;
+	if (token->type == CD && ++r_val)
+		mini_cd(token, env);
+	// else if (!ft_strcmp(token->str, "exit"))
+	// 	mini_exit(token, env);
+	else if (token->type == EXPORT && ++r_val)
+	 	mini_export(env, token->next);
+	else if (token->type == UNSET && ++r_val)
+		mini_unset(env, token->next);
+	else if (token->type == PWD && ++r_val)
+		mini_pwd(token->next);
+	else if (token->type == ENV && ++r_val)
+		mini_env(env);
+	else if (token->type == ECHO && ++r_val)
+		mini_echo(token->next);
+	return (r_val);
 }

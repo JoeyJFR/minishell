@@ -1,89 +1,94 @@
 #include "../../minishell.h"
 
-void	define_type(t_parse *node)
+/*
+initialize the argument
+*/
+void	init(char **str, char **arg_str, t_token **node)
 {
-	if (node->str[0] == '/')
-		node->type = ABS;
-	else if (!ft_strcmp(node->str, "<<"))
-		node->type = DL;
-	else if (!ft_strcmp(node->str, ">>"))
-		node->type = DR;
-	else if (!ft_strcmp(node->str, "<"))
-		node->type = SL;
-	else if (!ft_strcmp(node->str, ">"))
-		node->type = SR;
-	else if (!ft_strcmp(node->str, "|"))
-		node->type = PI;
-	else if (!ft_strcmp(node->str, "cd") || !ft_strcmp(node->str, "echo")
-		|| !ft_strcmp(node->str, "export") || !ft_strcmp(node->str, "env")
-		|| !ft_strcmp(node->str, "pwd") || !ft_strcmp(node->str, "unset")
-		|| !ft_strcmp(node->str, "exit"))
-		node->type = BUILT_IN;
-	else
-		node->type = ARG;
-}
-
-char	*fill_arg(char **str)
-{
-	char	*arg_str;
 	int		i;
 
-	i = len_word(*str, ' ');
-	arg_str = malloc(sizeof(char) * (i + 1));
-	if (!arg_str)
-		return (NULL);
-	arg_str = fill_str(str, ' ', arg_str);
-	return (arg_str);
+	i = len_word(*str);
+	*arg_str = ft_calloc(sizeof(char), i + 1);
+	if (!*arg_str)
+		return ;
+	*node = mini_lstnew(NULL);
+	if (!*node)
+		return (free(*arg_str));
+	(*node)->str = *arg_str;
 }
 
+/*
+init the node,
+fill its string's argument
+fill its type's argument
+*/
+t_token	*fill_arg(char **str)
+{
+	t_token *arg;
+	char	*arg_str;
+	
+	arg_str = NULL;
+	arg = NULL;
+	init(str, &arg_str, &arg);
+	if (is_ope(**str, NULL))
+	{
+		fill_ope(str, arg_str);
+		define_ope(arg);
+	}
+	else
+	{
+		fill_word(str, arg_str);
+		define_type(arg);
+	}
+	return (arg);
+}
+
+/*
+skip blanks
+*/
 void	skip_blank(char **str)
 {
 	while (**str && (**str == ' ' || **str == '\t'))
 		(*str)++;
 }
 
-t_parse	*define_arg(t_parse **list, char **str)
+/*
+skip the whitespaces in the inputed string,
+create and fill a new argument,
+add it to the current chained-list
+*/
+t_token	*define_arg(t_token **list, char **str)
 {
-	char	*arg_str;
-	t_parse	*node;
+	t_token	*arg;
 
 	skip_blank(str);
-	arg_str = fill_arg(str);
-	if (!arg_str)
+	arg = fill_arg(str);
+	if (!arg)
 		return (NULL);
-	if (*arg_str)
-	{
-		node = mini_lstnew(arg_str);
-		if (!node)
-			return (free(arg_str), NULL);
-		mini_lstadd_back(list, node);
-		define_type(node);
-	}
+	mini_lstadd_back(list, arg);
 	return (*list);
 }
-/*
-	Remplacer buffer par str en changeant les variables d'env et les quotes
-*/
 
-t_parse	*parsing(char *buffer, t_env *env)
+/*
+principal parsing function:
+	check if there is an unpaired quote
+	convert vars with there definition
+	define the chained-list
+*/
+t_token	*parsing(char *buffer, t_env *env)
 {
-	t_parse	*node;
+	t_alloc data;
 	char	*str;
 	char	*str_head;
 
-	node = NULL;
+	data.token_head = NULL;
+	data.env_head = env;
 	if (check_quotes(buffer) != -1)
-		return (printf("single quote\n"), NULL);
-	str = convert_var(buffer, env);
-	if (!str)
-		return (NULL);
+		return (print_error("Quote unpaired case"), NULL);
+	str = convert_var(buffer, &data);
 	str_head = str;
 	while (*str)
-	{
-		node = define_arg(&node, &str);
-		if (!node)
-			return (free(str_head), free_parse(node), NULL);
-	}
+		data.token_head = define_arg(&data.token_head, &str);
 	free(str_head);
-	return (node);
+	return (data.token_head);
 }

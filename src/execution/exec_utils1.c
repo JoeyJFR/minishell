@@ -1,6 +1,6 @@
 #include "../../minishell.h"
 
-int	check_env(t_env *env_head)
+int	check_path(t_env *env_head)
 {
 	while (env_head)
 	{
@@ -11,7 +11,7 @@ int	check_env(t_env *env_head)
 	return (1);
 }
 
-int	count_pid(t_parse *parse_result)
+int	count_pid(t_token *parse_result)
 {
 	int	i;
 
@@ -25,33 +25,21 @@ int	count_pid(t_parse *parse_result)
 	return (i);
 }
 
-void	ft_putstr_fd(char *s, int fd)
-{
-	size_t	l;
-
-	if (!s || !fd)
-		return ;
-	l = ft_strlen(s);
-	write(fd, s, l);
-}
-
 void	reform_env(t_env *env, char *environ[])
 {
-	int		i;
-	t_env	*temp;
+	int	i;
 
-	temp = env;
 	i = 0;
-	while (temp)
+	while (env)
 	{
-		environ[i] = temp->str;
+		environ[i] = env->str;
 		i++;
-		temp = temp->next;
+		env = env->next;
 	}
 	environ[i] = NULL;
 }
 
-void	handle_execve_fail(t_data *data, char *path, t_env *env_head)
+void	handle_execve_fail(t_data *data, char *path)
 {
 	perror("execve failed");
 	if (STDIN_FILENO != 0)
@@ -61,12 +49,10 @@ void	handle_execve_fail(t_data *data, char *path, t_env *env_head)
 	free(data->pid);
 	if (path)
 		free(path);
-	free_env(env_head);
-	free_parse(data->p_head);
 	exit (127);
 }
 
-int	wait_dup_free(t_data *data, t_env *env_head)
+int	wait_dup_free(t_data *data, t_token *parse_result)
 {
 	int		i;
 
@@ -75,10 +61,8 @@ int	wait_dup_free(t_data *data, t_env *env_head)
 		waitpid(data->pid[i++], NULL, 0);
 	if (data->pid)
 		free(data->pid);
-	if (data->p_head)
-		free_parse(data->p_head);
-	if (env_head)
-		free_env(env_head);
+	if (parse_result)
+		free_token(parse_result);
 	return (0);
 }
 

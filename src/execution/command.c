@@ -77,22 +77,22 @@ int	check_built_child(char *s)
 	return (0);
 }
 
-void	exec_cmd(char *av[], t_data *data, t_env *env_head)
+void	exec_cmd(char *av[], t_data *data)
 {
 	char	*path;
 
 	if (av[0][0] == '/')
 	{
 		if (execve(av[0], av, data->env) == -1)
-			handle_execve_fail(data, NULL, env_head);
+			handle_execve_fail(data, NULL);
 	}
 	else if (check_built_child(av[0]))
-		ft_built(av, data, env_head);
+		;//built_in(data->, data->env); to change
 	else
 	{
 		path = find_path(av[0], data->env);
 		if (execve(path, av, data->env) == -1)
-			handle_execve_fail(data, path, env_head);
+			handle_execve_fail(data, path);
 	}
 	return ;
 }

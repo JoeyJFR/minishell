@@ -92,18 +92,18 @@ void	ft_export(t_env *env_head)
 	free_env_cpy(env_cpy);
 }
 
-void	check_b_export(t_parse *parse_result, t_env *env_head)
+void	check_b_export(t_token *parse_result, t_env *env_head)
 {
 	if (!parse_result->next)
 	{
 		ft_export(env_head);
-		free_parse(parse_result);
+		free_token(parse_result);
 		return ;
 	}
 	else if (parse_result->next->str[0] == '-')
 	{
 		write(STDERR_FILENO, "wrong input, use: export without option.\n", 42);
-		free_parse(parse_result);
+		free_token(parse_result);
 		return ;
 	}
 	// else

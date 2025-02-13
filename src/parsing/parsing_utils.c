@@ -1,17 +1,8 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parsing_utils.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: v <v@student.42.fr>                        +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/03 08:23:25 by vgarcia           #+#    #+#             */
-/*   Updated: 2025/02/04 10:48:52y v                ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../minishell.h"
 
+/*
+check if there is a quote unpaired and return the first's
+*/
 int	check_quotes(char *s)
 {
 	int	check_first;
@@ -34,6 +25,9 @@ int	check_quotes(char *s)
 	return (-1);
 }
 
+/*
+checks if the unpaired quote is a single
+*/
 int	is_in_squote(char *str)
 {
 	int	checker;
@@ -46,58 +40,44 @@ int	is_in_squote(char *str)
 	return (0);
 }
 
-int	len_word(char *s, char c)
+/*
+checks what is the current operator it is dealing with
+*/
+int	is_ope(char c, char *current)
 {
-	int	i;
-	int	index_d;
-	int	index_s;
-
-	i = 0;
-	index_s = 1;
-	index_d = 1;
-	while (*s)
+	if (!current || !*current)
 	{
-		if (*s == '\"' && index_d == 1 && (index_s % 2))
-			--index_d;
-		else if (*s == '\"' && index_d == 0 && (index_s % 2))
-			++index_d;
-		else if (*s == 39 && index_s == 1 && (index_d % 2))
-			--index_s;
-		else if (*s == 39 && index_s == 0 && (index_d % 2))
-			++index_s;
-		if (*s == c && index_s && index_d)
-			break ;
-		i++;
-		s++;
+		if (c == '<' || c == '>' || c == '|')
+			return (1);
+		return (0);
 	}
-	return (i);
+	else if (*current == c && (c == '>' || c == '<'))
+		return (1);
+	else if (*current != '<' && *current != '>' \
+		&& *current != '|' && (c == '<' || c == '>' || c == '|'))
+		return (1);
+	return (0);
 }
 
-char	*fill_str(char **str, char c, char *result)
+void	exit_parsing(char *str, t_alloc *data, int status)
 {
-	int		index_d;
-	int		index_s;
-	int		j;
-
-	index_d = 1;
-	index_s = 1;
-	j = 0;
-	while (**str && (**str != c || !index_d || !index_s))
+	if (data)
 	{
-		if (**str == 39 && index_s == 1 && (index_d % 2))
-			--index_s;
-		else if (**str == 39 && index_s == 0 && (index_d % 2))
-			++index_s;
-		else if (**str == '\"' && index_d == 1 && (index_s % 2))
-			--index_d;
-		else if (**str == '\"' && index_d == 0 && (index_s % 2))
-			++index_d;
-		if ((index_s && !index_d && **str != '\"')
-			|| (index_d && !index_s && **str != '\'')
-			|| (index_d && index_s && **str != '\'' && **str != '\"'))
-			result[j++] = **str;
-		++(*str);
+		if (data->env_head)
+			free_env(data->env_head);
+		if (data->token_head)
+			free_token(data->token_head);
+		if (data->str)
+			free(data->str);
 	}
-	result[j] = '\0';
-	return (result);
+	if (str)
+		print_error(str);
+	exit(status);
+}
+
+void	print_error(char *str)
+{
+	ft_putstr_fd("Error : ", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd("\n", 2);
 }

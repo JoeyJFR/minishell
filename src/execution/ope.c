@@ -1,6 +1,6 @@
 #include "../../minishell.h"
 
-int	sl(t_parse **parse_result, t_data *data)
+int	sl(t_token **parse_result, t_data *data)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
@@ -25,7 +25,7 @@ int	sl(t_parse **parse_result, t_data *data)
 	return (0);
 }
 
-int	dl(t_parse **parse_result)
+int	dl(t_token **parse_result)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
@@ -38,7 +38,7 @@ int	dl(t_parse **parse_result)
 	return (0);
 }
 
-int	sr(t_parse **parse_result, t_data *data)
+int	sr(t_token **parse_result, t_data *data)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
@@ -64,7 +64,7 @@ int	sr(t_parse **parse_result, t_data *data)
 	return (0);
 }
 
-int	dr(t_parse **parse_result, t_data *data)
+int	dr(t_token **parse_result, t_data *data)
 {
 	(*parse_result) = (*parse_result)->next;
 	{
@@ -90,17 +90,17 @@ int	dr(t_parse **parse_result, t_data *data)
 	return (0);
 }
 
-int	ft_ope(t_parse **parse_result, t_data *data, char *av[], int cmd_index)
+int	ft_ope(t_token **parse_result, t_data *data, char *av[], int cmd_index)
 {
-	if ((*parse_result)->type == SR)
-		return (sr(parse_result, data));
-	else if ((*parse_result)->type == DR)
-		return (dr(parse_result, data));
-	else if ((*parse_result)->type == SL)
-		return (sl(parse_result, data));
-	else
+	if ((*parse_result)->type == DL)
 	{
 		av[cmd_index] = NULL;
 		return (dl(parse_result));
 	}
+	else if ((*parse_result)->type == SR)
+		return (sr(parse_result, data));
+	else if ((*parse_result)->type == DR)
+		return (dr(parse_result, data));
+	else
+		return (sl(parse_result, data));
 }

@@ -1,11 +1,10 @@
 #include "../../minishell.h"
 
-static int	exec_init(t_data *data, \
-					char *av[], t_parse *parse_result)
+static int	exec_init(int *cmd_index, t_data *data, \
+					char *av[], t_token *parse_result)
 {
-	data->cmd_index = 0;
+	*cmd_index = 0;
 	av[0] = NULL;
-	data->pid_nb = 0;
 	data->open_in_fail = 0;
 	data->open_out_fail = 0;
 	data->pid_nb = count_pid(parse_result);
@@ -16,83 +15,68 @@ static int	exec_init(t_data *data, \
 	return (0);
 }
 
-static int	mid_exec(t_parse **p_result, char *av[], t_data *data, t_env *env_head)
+static int	mid_exec(t_token **p_result, int *cmd_i, char *av[], t_data *data)
 {
 	if ((*p_result)->type == ARG)
-		av[(data->cmd_index)++] = (*p_result)->str;
+		av[(*cmd_i)++] = (*p_result)->str;
 	else if ((*p_result)->type == SL || (*p_result)->type == DL \
 			|| (*p_result)->type == SR || (*p_result)->type == DR)
 	{
 		if (data->open_in_fail)
 			return (0);
-		if (ft_ope(p_result, data, av, data->cmd_index))
+		if (ft_ope(p_result, data, av, *cmd_i))
 			return (1);
 		return (0);
 	}
 	else if ((*p_result)->type == PI)
 	{
-		av[data->cmd_index] = NULL;
-		if (handle_pipe(av, data, env_head))
+		av[*cmd_i] = NULL;
+		if (handle_pipe(av, data))
 			return (1);
-		data->cmd_index = 0;
+		*cmd_i = 0;
 	}
 	else if ((*p_result)->type == ABS)
-		av[(data->cmd_index)++] = (*p_result)->str;
+		av[(*cmd_i)++] = (*p_result)->str;
 	else
-		av[(data->cmd_index)++] = (*p_result)->str;
+		av[(*cmd_i)++] = (*p_result)->str;
 	return (0);
 }
 
-static int	last_exec(char *av[], t_data *data, t_env *env_head)
+static int	last_exec(char *av[], int cmd_index, t_data *data)
 {
 	pid_t	pid;
 
 	if (data->open_in_fail || data->open_out_fail)
 		return (0);
-	av[data->cmd_index] = NULL;
+	av[cmd_index] = NULL;
 	pid = fork();
 	if (pid == -1)
-	{
-		free(data->pid);
-		free_env(env_head);
-		free_parse(data->p_head);
 		return (perror("fork in last exec"), 1);
-	}
 	if (pid == 0)
-	{
-		exec_cmd(av, data, env_head);
-		return (0);
-	}
-	else
-	{
-		close(STDIN_FILENO);
-		close(STDOUT_FILENO);
-		(data->pid)[(data->pid_nb)++] = pid;
-		return (0);
-	}
+		exec_cmd(av, data);
+	close(STDIN_FILENO);
+	close(STDOUT_FILENO);
+	(data->pid)[data->pid_nb++] = pid;
+	return (0);
 }
 
-int	exec(t_parse *parse_result, t_data *data, t_env *env_head)
+int	exec(t_token *parse_result, t_data *data)
 {
 	char	*av[BUFFER_SIZE];
+	int		cmd_index;
 
-	data->p_head = parse_result;
-	if (exec_init(data, av, parse_result))
-	{
-		free_parse(parse_result);
-		free_env(env_head);
+	if (exec_init(&cmd_index, data, av, parse_result))
 		return (get_error_code());
-	}
 	while (parse_result)
 	{
-		if (mid_exec(&parse_result, av, data, env_head))
-			return (free(data->pid), free_env(env_head), free_parse(data->p_head), get_error_code());
+		if (mid_exec(&parse_result, &cmd_index, av, data))
+			return (free(data->pid), get_error_code());
 		parse_result = parse_result->next;
 	}
-	if (data->cmd_index > 0)
+	if (cmd_index > 0)
 	{
-		if (last_exec(av, data, env_head))
-			return (get_error_code());
+		if (last_exec(av, cmd_index, data))
+			return (free(data->pid), get_error_code());
 	}
-	return (wait_dup_free(data, env_head));
+	return (wait_dup_free(data, parse_result));
 }

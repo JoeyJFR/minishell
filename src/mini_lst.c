@@ -1,10 +1,10 @@
 #include "../minishell.h"
 
-t_parse	*mini_lstnew(char *str)
+t_token	*mini_lstnew(char *str)
 {
-	t_parse	*new_list;
+	t_token	*new_list;
 
-	new_list = malloc(sizeof(t_parse));
+	new_list = malloc(sizeof(t_token));
 	if (!new_list)
 		return (NULL);
 	new_list->str = str;
@@ -14,7 +14,7 @@ t_parse	*mini_lstnew(char *str)
 	return (new_list);
 }
 
-int	mini_lstsize(t_parse *lst)
+int	mini_lstsize(t_token *lst)
 {
 	int	i;
 
@@ -29,16 +29,16 @@ int	mini_lstsize(t_parse *lst)
 	return (i);
 }
 
-void	mini_lstadd_front(t_parse **lst, t_parse *new)
+void	mini_lstadd_front(t_token **lst, t_token *new)
 {
 	new->next = *lst;
 	(*lst)->prev = new;
 	*lst = new;
 }
 
-void	mini_lstadd_back(t_parse **lst, t_parse *new)
+void	mini_lstadd_back(t_token **lst, t_token *new)
 {
-	t_parse	*temp;
+	t_token	*temp;
 
 	temp = *lst;
 	if (!*lst)
@@ -52,9 +52,9 @@ void	mini_lstadd_back(t_parse **lst, t_parse *new)
 	}
 }
 
-void	free_parse(t_parse *parse)
+void	free_token(t_token *parse)
 {
-	t_parse	*tmp;
+	t_token	*tmp;
 
 	while (parse)
 	{
