@@ -13,11 +13,14 @@
 
 CC=cc
 
-SRC=src/main.c src/mini_lst.c src/env_lst.c src/mini_utils.c\
-	src/parsing/parsing.c src/parsing/parsing_utils.c src/parsing/convert_var.c src/parsing/convert_var_2.c src/parsing/parsing_env.c src/parsing/fill_node_utils.c\
+SRC=src/main.c src/mini_lst.c src/env_lst.c src/mini_utils.c src/exit_utils.c \
+	src/parsing/parsing.c src/parsing/parsing_utils.c src/parsing/convert_var.c src/parsing/convert_var_2.c \
+	src/parsing/parsing_env.c src/parsing/fill_node_utils.c src/parsing/check_syntax.c \
 	src/built_in/mini_cd.c src/built_in/mini_export.c src/built_in/mini_exit.c src/built_in/mini_env.c src/built_in/mini_echo.c\
 	src/built_in/mini_pwd.c src/built_in/mini_unset.c src/built_in/mini_export_2.c src/built_in/mini_export_3.c\
-	src/execution/check_builtin.c src/execution/command.c src/execution/exec_utils1.c src/execution/exec.c src/execution/heredoc.c src/execution/ope.c src/execution/pipe.c
+	src/execution/command.c src/execution/exec_utils1.c src/execution/exec.c \
+	src/execution/open_heredoc.c src/execution/open_file.c src/execution/pipe.c src/execution/redirect.c src/execution/handle_heredoc.c\
+	src/execution/check_builtin.c
 
 LIBFT=ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c ft_strlen.c ft_memset.c ft_bzero.c ft_memcpy.c ft_memmove.c ft_strlcpy.c ft_strlcat.c ft_toupper.c ft_tolower.c\
 	ft_strchr.c ft_strrchr.c ft_strncmp.c ft_memchr.c ft_memcmp.c ft_strnstr.c ft_atoi.c ft_calloc.c ft_strdup.c ft_substr.c ft_strjoin.c ft_strtrim.c ft_split.c ft_itoa.c ft_strmapi.c\
@@ -41,7 +44,11 @@ LIB=libft.a
 
 NAME=minishell
 
+
 all : $(NAME)
+
+debug : $(NAME)
+	valgrind --leak-check=full --show-leak-kinds=all --suppressions=ignore_rl.txt --trace-children=yes --track-fds=yes --track-origins=yes -s ./$(NAME)
 
 $(NAME) : $(OBJ) $(PATH_LIB)$(LIB)
 	@$(MAKE) --no-print-directory -C $(PATH_LIB)

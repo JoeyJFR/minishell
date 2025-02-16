@@ -1,36 +1,51 @@
 #include "../../minishell.h"
 
-static void	edit_env(t_env *env, char *str)
+size_t	len_before(char *s)
+{
+	size_t	i;
+
+	i = 0;
+	while (s[i] && s[i] != '=')
+		i++;
+	return (i);
+}
+
+static void	edit_env(t_env **env, char *str)
 {
 	t_env	*tmp;
+	t_env	*prev;
 
-	if (!ft_strncmp(str, env->str, ft_strlen(str)))
+	tmp = *env;
+	prev = *env;
+	if (!ft_strncmp(str, (*env)->str, ft_strlen(str)) \
+	&& (ft_strlen(str) == len_before((*env)->str)))
 	{
-		tmp = env;
-		env = env->next;
-		free(tmp->str);
-		free(tmp);
-		return ;
+		*env = (*env)->next;
+		return (free(tmp->str), free(tmp));
 	}
-	while (env->next)
+	tmp = (*env)->next;
+	while (tmp)
 	{
-		if (!ft_strncmp(str, env->next->str, ft_strlen(str)))
+		if (!ft_strncmp(str, tmp->str, ft_strlen(str)) \
+		&& (ft_strlen(str) == len_before(tmp->str)))
 		{
-			tmp = env->next;
-			env->next = env->next->next;
-			free(tmp->str);
-			free(tmp);
+			prev->next = tmp->next;
+			return (free(tmp->str), free(tmp));
 		}
-		env = env->next;
+		prev = tmp;
+		tmp = tmp->next;
 	}
 }
 
-void mini_unset(t_env *env, t_token *token)
+int	mini_unset(t_env *env, char *av[])
 {
-	while (token && token->type <= 2)
+	int	i;
+
+	i = 1;
+	while (av[i])
 	{
-		edit_env(env, token->str);	
-		token = token->next;
+		edit_env(&env, av[i]);
+		i++;
 	}
-	return ;
+	return (0);
 }

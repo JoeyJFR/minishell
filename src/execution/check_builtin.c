@@ -1,23 +1,20 @@
 #include "../../minishell.h"
 
-int	built_in(t_token *token, t_env *env)
+int	built_in(char *av[], t_data *data, t_alloc *alloc)
 {
-	int r_val;
-
-	r_val = 0;
-	if (token->type == CD && ++r_val)
-		mini_cd(token, env);
-	// else if (!ft_strcmp(token->str, "exit"))
-	// 	mini_exit(token, env);
-	else if (token->type == EXPORT && ++r_val)
-	 	mini_export(env, token->next);
-	else if (token->type == UNSET && ++r_val)
-		mini_unset(env, token->next);
-	else if (token->type == PWD && ++r_val)
-		mini_pwd(token->next);
-	else if (token->type == ENV && ++r_val)
-		mini_env(env);
-	else if (token->type == ECHO && ++r_val)
-		mini_echo(token->next);
-	return (r_val);
+	if (!ft_strcmp(av[0], "cd"))
+		return (mini_cd(av, data));
+	else if (!ft_strcmp(av[0], "exit"))
+		mini_exit(av, alloc, data);
+	else if (!ft_strcmp(av[0], "export"))
+		return (mini_export(av, alloc));
+	else if (!ft_strcmp(av[0], "unset"))
+		return (mini_unset(alloc->env_head, av));
+	else if (!ft_strcmp(av[0], "pwd"))
+		return (mini_pwd(av));
+	else if (!ft_strcmp(av[0], "env"))
+		return (mini_env(alloc));
+	else if (!ft_strcmp(av[0], "echo"))
+		return (mini_echo(av));
+	return (0);
 }

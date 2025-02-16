@@ -1,42 +1,65 @@
 
 #include "../../minishell.h"
 
-static void	add_var(t_env *env, char *str)
+t_env	*env_lstnew_export(char *str)
+{
+	t_env	*new_list;
+
+	if (!str)
+		return (NULL);
+	new_list = malloc(sizeof(t_env));
+	if (!new_list)
+		return (NULL);
+	new_list->str = ft_strdup(str);
+	new_list->next = NULL;
+	return (new_list);
+}
+
+static void	add_var(t_env *env, char *str, t_alloc *alloc)
 {
 	t_env	*new_var;
 	int		i_env;
 
 	i_env = check_in_env(env, str);
 	if (i_env >= 0)
-		change_var(env, str, i_env);
+		change_var(env, str, i_env, alloc);
 	else
 	{
-		new_var = env_lstnew(str);
+		new_var = env_lstnew_export(str);
 		if (!new_var)
-			;//ok we got an issue
+			exit_parsing("Malloc", alloc, 1);
 		env_lstadd_back(&env, new_var);
 	}
 }
 
-void	mini_export(t_env *env, t_token* token)
+int	mini_export(char *av[], t_alloc *alloc)
 {
-	if (!token || (token && token->type > 8))
-		return (ascii_env(env));
-	while (token && token->type <= 8)
+	int		i;
+	t_env	*temp;
+
+	i = 0;
+	temp = alloc->env_head;
+	if (av[1] == NULL)
 	{
-		if (token->str[0] == '-')
-		{
-			print_error("mini_export takes no option\n");
-			return ;
-		}
-		if (check_name(token->str))
+		ascii_env(temp, alloc);
+		return (0);
+	}
+	if (av[1][0] == '-')
+	{
+		print_error("mini_export takes no option\n");
+		return (1);
+	}
+	while (av[1 + i])
+	{
+		if (check_name(av[1 + i]))
 		{
 			print_error("Invalid identifier");
-			return ;
+			return (1);
 		}
-		if (check_def(token->str))
-			return ;
-		add_var(env, token->str);
-		token = token->next;
+		if (check_def(av[1 + i]))
+			return (1);
+		add_var(temp, av[1 + i], alloc);
+		i++;
 	}
+	return (0);
 }

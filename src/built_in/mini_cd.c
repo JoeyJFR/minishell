@@ -1,19 +1,29 @@
 #include "../../minishell.h"
 
-void	mini_cd(t_token *pr, t_env *env)
+int	mini_cd(char *av[], t_data *data)
 {
-	if (!pr->next)
+	int	i;
+
+	i = 0;
+	if (av[2])
+		return (print_error("cd: too many arguments"), 1);
+	else if (!av[1])
 	{
-		while (env)
+		while (data->env[i])
 		{
-			if (!ft_strncmp("HOME=", env->str, 5))
-				chdir(&env->str[5]);
-			env = env->next;
+			if (!ft_strncmp("HOME=", data->env[i], 5))
+			{
+				chdir(data->env[i] + 5);
+				return (0);
+			}
+			i++;
 		}
-		return ;
+		return (print_error("no HOME variable"), 1);
 	}
-	else if (pr->next->next)
-		return ;
-	else if (chdir(pr->next->str) == -1)
-		printf("path incorrect/no right to go there\n");
+	else
+	{
+		if (chdir(av[1]) == -1)
+			return (print_error("Incorrect path / no right to go there\n"), 1);
+	}
+	return (0);
 }

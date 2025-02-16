@@ -1,11 +1,15 @@
 #include "../../minishell.h"
 
-void	mini_env(t_env *env)
+int	mini_env(t_alloc *alloc)
 {
-	while (env)
+	t_env *temp;
+
+	temp = alloc->env_head;
+	while (temp)
 	{
-		write(STDOUT_FILENO, env->str, ft_strlen(env->str));
+		write(STDOUT_FILENO, temp->str, ft_strlen(temp->str));
 		write(STDOUT_FILENO, "\n", 1);
-		env = env->next;
+		temp = temp->next;
 	}
+	return (0);
 }

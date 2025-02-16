@@ -66,30 +66,43 @@ static	char	*find_path(char *cmd, char *env[])
 	return (NULL);
 }
 
-int	check_built_child(char *s)
+int	check_built(char *s)
 {
-	if (!ft_strcmp(s, "echo"))
+	if (!ft_strcmp(s, "cd"))
+		return (1);
+	else if (!ft_strcmp(s, "echo"))
+		return (1);
+	else if (!ft_strcmp(s, "env"))
+		return (1);
+	else if (!ft_strcmp(s, "exit"))
+		return (1);
+	else if (!ft_strcmp(s, "export"))
 		return (1);
 	else if (!ft_strcmp(s, "pwd"))
 		return (1);
-	else if (!ft_strcmp(s, "env"))
+	else if (!ft_strcmp(s, "unset"))
 		return (1);
 	return (0);
 }
 
-void	exec_cmd(char *av[], t_data *data)
+void	exec_cmd(char *av[], t_data *data, t_alloc *alloc)
 {
 	char	*path;
 
 	if (av[0][0] == '/')
 	{
+		close_all_fd(data);
 		if (execve(av[0], av, data->env) == -1)
 			handle_execve_fail(data, NULL);
 	}
-	else if (check_built_child(av[0]))
-		;//built_in(data->, data->env); to change
+	else if (check_built(av[0]))
+	{
+		close_all_fd(data);
+		exit (built_in(av, data, alloc));
+	}
 	else
 	{
+		close_all_fd(data);
 		path = find_path(av[0], data->env);
 		if (execve(path, av, data->env) == -1)
 			handle_execve_fail(data, path);

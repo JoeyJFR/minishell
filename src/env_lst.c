@@ -8,7 +8,7 @@ t_env	*env_lstnew(char *str)
 		return (NULL);
 	new_list = malloc(sizeof(t_env));
 	if (!new_list)
-		return (free(str), NULL);
+		return (NULL);
 	new_list->str = str;
 	new_list->next = NULL;
 	return (new_list);
@@ -19,8 +19,6 @@ int	env_lstsize(t_env *lst)
 	int	i;
 
 	i = 0;
-	if (!lst)
-		return (0);
 	while (lst)
 	{
 		++i;

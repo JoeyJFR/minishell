@@ -15,13 +15,40 @@ int	check_var(char *var, t_env *env)
 	return (-1);
 }
 
+char	*add_code(char *old_str, t_env *env, int exit_code, int buf_len)
+{
+	char	*var;
+	char	*str;
+	int		var_len;
+
+	var = ft_itoa(exit_code);
+	if (!var)
+	{
+		free(old_str);
+		free_env(env);
+		exit_with_msg("Malloc", 1);
+	}
+	var_len = ft_strlen(old_str) + ft_strlen(var) + buf_len + 1;
+	str = ft_calloc(sizeof(char), var_len);
+	if (!str)
+	{
+		free(var);
+		free(old_str);
+		free_env(env);
+		exit_with_msg("Malloc", 1);
+	}
+	str = ft_strcpy(str, old_str);
+	str = ft_strcat(str, var);
+	free(old_str);
+	free(var);
+	return (str);
+}
 char *fill_var(char **buffer)
 {
 	char	*var;
 	int		i;
 
 	i = 0;
-	++(*buffer);
 	while (ft_isalnum((*buffer)[i]) || (*buffer)[i] == '_')
 		++i;
 	var = malloc(sizeof(char) * (i + 1));	
@@ -34,40 +61,49 @@ char *fill_var(char **buffer)
 	return (var);
 }
 
-char	*handle_var(char *str, char **buf, t_alloc *data)
+char	*handle_var(char *str, char **buf, t_env *env, int exit_code)
 {
 	char	*var;
 	int		var_index;
 
-	var = fill_var(buf);
-	if (!var)
+	++(*buf);
+	if (**buf == '?')	
+		str = add_code(str, env, exit_code, ft_strlen(++(*buf)));
+	else
 	{
-		free(str);
-		exit_parsing("Malloc", data, 1);
+		var = fill_var(buf);
+		if (!var)
+		{
+			free(str);
+			free_env(env);
+			exit_with_msg("Malloc", 1);
+		}
+		var_index = check_var(var, env);
+		free(var);
+		if (var_index == -1)
+			return (str);
+		str = add_env_var(str, env, var_index, ft_strlen(*buf));
 	}
-	var_index = check_var(var, data->env_head);
-	free(var);
-	if (var_index == -1)
-		return (str);
-	str = add_env_var(str, data, var_index, ft_strlen(*buf));
 	return (str);
 }
 
-char	*convert_var(char *buf, t_alloc *data)
+char	*convert_var(char *buf, t_env *env, int exit_code)
 {
 	char	*str;
 	int		i;
 
 	i = 0;
-	str = malloc(sizeof(char) * (ft_strlen(buf) + 1));
+	str = ft_calloc(sizeof(char), ft_strlen(buf) + 1);
 	if (!str)
-		exit_parsing("Malloc", data, 1);
-	*str = '\0';
+	{
+		free_env(env);
+		exit_with_msg("Malloc", 1);
+	}
 	while (*buf)
 	{
 		if (*buf == '$' && !is_in_squote(str))
 		{
-			str = handle_var(str, &buf, data);
+			str = handle_var(str, &buf, env, exit_code);
 			if (str == NULL)
 				return (NULL);
 			i = ft_strlen(str);

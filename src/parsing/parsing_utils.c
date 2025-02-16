@@ -51,7 +51,7 @@ int	is_ope(char c, char *current)
 			return (1);
 		return (0);
 	}
-	else if (*current == c && (c == '>' || c == '<'))
+	else if (*current == c && (c == '>' || c == '<') && !*(current + 1))
 		return (1);
 	else if (*current != '<' && *current != '>' \
 		&& *current != '|' && (c == '<' || c == '>' || c == '|'))
@@ -59,25 +59,23 @@ int	is_ope(char c, char *current)
 	return (0);
 }
 
-void	exit_parsing(char *str, t_alloc *data, int status)
+/*
+check the number of command
+*/
+int	count_cmd(t_token *token)
 {
-	if (data)
-	{
-		if (data->env_head)
-			free_env(data->env_head);
-		if (data->token_head)
-			free_token(data->token_head);
-		if (data->str)
-			free(data->str);
-	}
-	if (str)
-		print_error(str);
-	exit(status);
-}
+	int	i;
 
-void	print_error(char *str)
-{
-	ft_putstr_fd("Error : ", 2);
-	ft_putstr_fd(str, 2);
-	ft_putstr_fd("\n", 2);
+	i = 0;
+	if (token)
+		i = 1;
+	while (token->prev)
+	 	token = token->prev;
+	while (token)
+	{
+		if (token->type == PI)
+			++i;
+		token = token->next;
+	}
+	return (i);
 }

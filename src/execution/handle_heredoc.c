@@ -21,8 +21,6 @@ static	void	loop_call(t_token *parse_result, int fd[])
 		}
 		ft_putstr_fd(s, fd[1]);
 	}
-	if (!s)
-		free(s);
 	return ;
 }
 

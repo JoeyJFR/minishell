@@ -1,41 +1,33 @@
 
 #include "../../minishell.h"
 
-static int check_option(t_token **token)
+static int check_option(char *av[])
 {
 	int	option;
 	int	i;
 
 	i = 1;
 	option = 0;
-	while (*token && (*token)->str[0] == '-')
-	{
-		while ((*token)->str[i] && (*token)->str[i] == 'n')
-			++i;
-		if ((*token)->str[i])
-			break ;
-		else
-		{
-			i = 1;
-			option = 1;
-		}
-		*token = (*token)->next;
-	}
+	if (!ft_strcmp(av[1], "-n"))
+		option = 1;
 	return (option);
 }
 
-void	mini_echo(t_token *token)
+int	mini_echo(char *av[])
 {
 	int	option;
+	int	i;
 
-	option = check_option(&token);
-	while (token && token->type <= 2)
+	i = 1;
+	option = check_option(av);
+	while (av[i + option])
 	{
-		write(STDOUT_FILENO, token->str, ft_strlen(token->str));
-		if (token->next && token->next->type <= 2)
+		write(STDOUT_FILENO, av[i + option], ft_strlen(av[i + option]));
+		if (av[i + option + 1])
 			write(STDOUT_FILENO, " ", 1);
-		token = token->next;
+		i++;
 	}
 	if (!option)
 		write (STDOUT_FILENO, "\n", 1);
+	return (1);
 }

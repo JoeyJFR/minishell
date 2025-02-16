@@ -24,21 +24,21 @@ int	check_def(char *str)
 	return (0);
 }
 
-void	change_var(t_env *env, char *str, int i)
+void	change_var(t_env *env, char *str, int i, t_alloc *alloc)
 {
 	while (i--)
 		env = env->next;
 	free(env->str);
 	env->str = ft_strdup(str);
 	if (!env->str)
-		write(STDOUT_FILENO, "Malloc\n", 7);
-		//exit
+		exit_parsing("Alloc", alloc, 1);
 }
 
 int	check_in_env(t_env *env, char *str)
 {
 	int	i;
 	int	j;
+	int	k;
 
 	i = 0;
 	j = 0;
@@ -46,8 +46,14 @@ int	check_in_env(t_env *env, char *str)
 		++i;
 	while (env)
 	{
+		k = 0;
 		if (!ft_strncmp(env->str, str, i))
-			return (j);
+		{
+			while (env->str[k] && env->str[k] != '=')
+				k++;
+			if (i == k)
+				return (j);
+		}
 		env = env->next;
 		++j;
 	}
