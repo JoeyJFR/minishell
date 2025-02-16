@@ -66,43 +66,45 @@ static	char	*find_path(char *cmd, char *env[])
 	return (NULL);
 }
 
-int	check_built(char *s)
+void	relative_path(char *cmd, t_data *data)
 {
-	if (!ft_strcmp(s, "cd"))
-		return (1);
-	else if (!ft_strcmp(s, "echo"))
-		return (1);
-	else if (!ft_strcmp(s, "env"))
-		return (1);
-	else if (!ft_strcmp(s, "exit"))
-		return (1);
-	else if (!ft_strcmp(s, "export"))
-		return (1);
-	else if (!ft_strcmp(s, "pwd"))
-		return (1);
-	else if (!ft_strcmp(s, "unset"))
-		return (1);
-	return (0);
+	char	*cwd;
+	char	*full_path;
+
+	cwd = getcwd(NULL, 0);
+	if (cwd == NULL)
+		handle_execve_fail(data, NULL);
+	full_path = malloc(ft_strlen(cwd) + ft_strlen(cmd + 2));
+	if (full_path == NULL)
+	{
+		free(cwd);
+		handle_execve_fail(data, NULL);
+	}
+	ft_strcpy(full_path, cwd);
+	ft_strlcat(full_path, "/", 1);
+	ft_strlcat(full_path, cmd, 1);
+	free(cwd);
+	if (execve(full_path, &cmd, data->env) == -1)
+		handle_execve_fail(data, full_path);
 }
 
 void	exec_cmd(char *av[], t_data *data, t_alloc *alloc)
 {
 	char	*path;
 
+
+	close_all_fd(data);
 	if (av[0][0] == '/')
 	{
-		close_all_fd(data);
 		if (execve(av[0], av, data->env) == -1)
 			handle_execve_fail(data, NULL);
 	}
 	else if (check_built(av[0]))
-	{
-		close_all_fd(data);
 		exit (built_in(av, data, alloc));
-	}
+	else if (av[0][0] == '.')
+		relative_path(av[1], data);
 	else
 	{
-		close_all_fd(data);
 		path = find_path(av[0], data->env);
 		if (execve(path, av, data->env) == -1)
 			handle_execve_fail(data, path);

@@ -2,6 +2,8 @@
 
 int	sr(t_token **parse_result, t_data *data)
 {
+	if (data->no_permission == 1)
+		return (0);
 	(*parse_result) = (*parse_result)->next;
 	if (*parse_result && (*parse_result)->type == ARG)
 	{
@@ -10,7 +12,7 @@ int	sr(t_token **parse_result, t_data *data)
 		if (data->outfile == -1)
 		{
 			perror("open in sr");
-			data->open_out_fail = 1;
+			data->no_permission = 1;
 			return (0);
 		}
 		if (dup2(data->outfile, STDOUT_FILENO) == -1)
@@ -29,6 +31,8 @@ int	sr(t_token **parse_result, t_data *data)
 
 int	dr(t_token **parse_result, t_data *data)
 {
+	if (data->no_permission == 1)
+		return (0);
 	(*parse_result) = (*parse_result)->next;
 	if (*parse_result && (*parse_result)->type == ARG)
 	{
@@ -37,7 +41,7 @@ int	dr(t_token **parse_result, t_data *data)
 		if (data->outfile == -1)
 		{
 			perror("open in dr");
-			data->open_out_fail = 1;
+			data->no_permission = 1;
 			return (0);
 		}
 		if (dup2(data->outfile, STDOUT_FILENO) == -1)
@@ -56,6 +60,8 @@ int	dr(t_token **parse_result, t_data *data)
 
 int	sl(t_token **parse_result, t_data *data)
 {
+	if (data->no_permission == 1)
+		return (0);
 	(*parse_result) = (*parse_result)->next;
 	if (*parse_result && (*parse_result)->type == ARG)
 	{
@@ -63,7 +69,7 @@ int	sl(t_token **parse_result, t_data *data)
 		if (data->infile == -1)
 		{
 			perror("open in sl");
-			data->open_in_fail = 1;
+			data->no_permission = 1;
 			return (0);
 		}
 		if (dup2(data->infile, STDIN_FILENO) == -1)

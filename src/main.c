@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-void	ctrl_c(int sig)
+void	sigint_handler(int sig)
 {
 	(void)sig;
 	write(1, "\n", 1);
@@ -9,6 +9,18 @@ void	ctrl_c(int sig)
 	rl_redisplay();
 }
 
+void	sigterm_handler(int sig)
+{
+	(void)sig;
+	exit(0);
+}
+
+void	init_signal(void)
+{
+	signal(SIGINT, sigint_handler);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTERM, sigterm_handler);
+}
 /* to do/redo
 exec special cases / valgrind
 signals
@@ -23,15 +35,12 @@ int main(int ac, char **av, char **envp)
 	t_alloc	alloc;
 	t_env	*env;
 	t_token	*token;
-	struct sigaction sig_b;
 
 	(void)ac;
 	(void)av;
 	alloc.exit_status = 0;
 	alloc.str = NULL;
-    signal(SIGINT, ctrl_c);
-    sig_b.sa_handler = SIG_IGN;
-    sigaction(SIGQUIT, &sig_b, NULL);
+    init_signal();
 	env = parse_env(envp);
 	alloc.env_head = env;
 	if (alloc.env_head == NULL)
@@ -40,9 +49,16 @@ int main(int ac, char **av, char **envp)
 	{
 		//read_input
 		//parsing
+		if (alloc.exit_status == 131)
+			write(1, "Quit (core dumped)\n", 20);
+		if (alloc.exit_status == 130)
+			write(1, "\n", 1);
 		str = readline(" readline > ");
 		if (!str)
+		{
+			write(1, "exit\n", 6);
 			break ;
+		}
 		else if (!*str)
 		{
 			free(str);

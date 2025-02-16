@@ -63,7 +63,10 @@ void	wait_free(t_data *data, t_alloc *alloc)
 	while (i < data->pid_nb)
 	{
 		waitpid(data->pid[i++], &status, 0);
-		alloc->exit_status = WEXITSTATUS(status);
+		if (WIFEXITED(status))
+			alloc->exit_status = WEXITSTATUS(status);
+		else
+			alloc->exit_status = WTERMSIG(status) + 128;
 	}
 	if (data->pid)
 		free(data->pid);
@@ -152,4 +155,23 @@ int	check_only_builtin(char *av[], t_alloc *alloc)
 	}
 	else
 		return (0);
+}
+
+int	check_built(char *s)
+{
+	if (!ft_strcmp(s, "cd"))
+		return (1);
+	else if (!ft_strcmp(s, "echo"))
+		return (1);
+	else if (!ft_strcmp(s, "env"))
+		return (1);
+	else if (!ft_strcmp(s, "exit"))
+		return (1);
+	else if (!ft_strcmp(s, "export"))
+		return (1);
+	else if (!ft_strcmp(s, "pwd"))
+		return (1);
+	else if (!ft_strcmp(s, "unset"))
+		return (1);
+	return (0);
 }

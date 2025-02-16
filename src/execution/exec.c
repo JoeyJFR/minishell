@@ -4,11 +4,11 @@ static int	exec_init(t_data *data, t_token *token, t_env *env)
 {
 	data->pid_nb = count_pid(token);
 	data->cmd_i = 0;
-	data->open_in_fail = 0;
-	data->open_out_fail = 0;
 	data->pid = malloc((sizeof(pid_t) * data->pid_nb));
 	data->infile = -1;
 	data->outfile = -2;
+	data->no_permission = 0;
+	data->core = 0;
 	if (!data->pid)
 		return (perror("malloc for pid_nb"), 1);
 	data->pid_nb = 0;
@@ -26,13 +26,16 @@ static int	last_exec(char *av[], t_data *data, t_alloc *alloc)
 {
 	pid_t	pid;
 
-	if (data->open_in_fail || data->open_out_fail)
+	if (data->no_permission)
 		return (0);
 	pid = fork();
 	if (pid == -1)
 		return (perror("fork in last exec"), 1);
 	if (pid == 0)
+	{
+		signal(SIGQUIT, SIG_DFL);
 		exec_cmd(av, data, alloc);
+	}
 	else
 	{
 		close(STDOUT_FILENO);

@@ -62,11 +62,11 @@ typedef struct s_data
 	int		outfile;
 	int		stdout_backup;
 	int		stdin_backup;
-	int		open_out_fail;
-	int		open_in_fail;
 	int		pid_nb;
 	pid_t	*pid;
 	int		cmd_i;
+	int		core;
+	int		no_permission;
 	char	*env[BUFFER_SIZE];
 }	t_data;
 
@@ -154,10 +154,18 @@ int		redirect_file(t_data *data, t_token **parse_result);
 void	open_heredoc(t_token *parse_result);
 int		check_ope(t_token *token);
 int		check_inter_ope(t_token *token);
-void 	free_close(t_data *data);
+void	free_close(t_data *data);
 void	close_all_fd(t_data *data);
 int		built_in(char *av[], t_data *data, t_alloc *alloc);
 int		check_built(char *s);
 int		check_only_builtin(char *av[], t_alloc *alloc);
+int		check_built(char *s);
+
+//signal
+void	sigint_handler(int sig);
+void	sigterm_handler(int sig);
+void	sigquit_handler(int sig);
+void	child_int(int sig);
+void	child_seg(int sig);
 
 #endif

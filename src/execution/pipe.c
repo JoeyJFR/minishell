@@ -12,6 +12,7 @@ void	child(char *av[], t_data *data, int fd[], t_alloc *alloc)
 		exit(get_error_code());
 	}
 	close(fd[1]);
+	signal(SIGQUIT, SIG_DFL);
 	exec_cmd(av, data, alloc);
 }
 
@@ -25,7 +26,12 @@ int	handle_open_fail(int fd[], t_data *data)
 		return (1);
 	}
 	close (fd[0]);
-	data->open_in_fail = 0;
+	data->no_permission = 0;
+	if (data->stdout_backup != STDOUT_FILENO)
+	{
+		if (dup2(data->stdout_backup, STDOUT_FILENO) == -1)
+			return (close(data->stdout_backup), close(data->stdin_backup), perror("dup2 for STDOUT"), 1);
+	}
 	return (0);
 }
 
@@ -33,6 +39,7 @@ void	child_special(char *av[], t_data *data, int fd[], t_alloc *alloc)
 {
 	close(fd[0]);
 	close(fd[1]);
+	signal(SIGQUIT, SIG_DFL);
 	exec_cmd(av, data, alloc);
 }
 
@@ -43,7 +50,7 @@ int	handle_pipe(t_token *token, char *av[], t_data *data, t_alloc *alloc)
 
 	if (pipe(fd) == -1)
 		return (perror ("pipe"), 1);
-	if (data->open_in_fail)
+	if (data->no_permission)
 		return (handle_open_fail(fd, data));
 	pid = fork();
 	if (pid == 0)
@@ -59,7 +66,10 @@ int	handle_pipe(t_token *token, char *av[], t_data *data, t_alloc *alloc)
 		return (perror("dup2 in handle pipe"), close(fd[0]), 1);
 	close (fd[0]);
 	(data->pid)[data->pid_nb++] = pid;
-	// if (dup2(data->stdout_backup, STDOUT_FILENO) == -1)
-	// 	return (perror("dup2 for stdout_backup after pipe"), 1);
+	if (data->stdout_backup != STDOUT_FILENO)
+	{
+		if (dup2(data->stdout_backup, STDOUT_FILENO) == -1)
+			return (close(data->stdout_backup), close(data->stdin_backup), perror("dup2 for STDOUT"), 1);
+	}
 	return (0);
 }
