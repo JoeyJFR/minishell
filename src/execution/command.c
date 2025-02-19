@@ -1,113 +1,88 @@
 #include "../../minishell.h"
 
-static	char	*ft_strjoin1(char const *s1, char const *s2)
-{
-	size_t		i;
-	int			j;
-	char		*ptr;
-
-	if (s1 == NULL || s2 == NULL)
-		return (NULL);
-	i = ft_strlen(s1) + ft_strlen(s2);
-	ptr = (char *)malloc((i + 2) * sizeof(char));
-	if (!ptr)
-		return (perror("malloc in strjoin1"), NULL);
-	i = 0;
-	j = 0;
-	while (s1[i])
-		ptr[j++] = s1[i++];
-	ptr[j++] = '/';
-	i = 0;
-	while (s2[i])
-		ptr[j++] = s2[i++];
-	ptr[j] = '\0';
-	return (ptr);
-}
-
-static	void	ft_free_path(char **s)
+void	check_rel_arg(char	*s, t_data *data, t_alloc *alloc)
 {
 	int	i;
 
-	i = 0;
+	i = 1;
+	if (!s[i])
+		handle_rel_sfail(data, "Error: filename required\n", alloc);
 	while (s[i])
 	{
-		free(s[i]);
+		if (s[i] != '.')
+			return ;
 		i++;
 	}
-	free(s);
+	handle_rel_fail(data, NULL, "Error: no argument\n", alloc);
 }
 
-static	char	*find_path(char *cmd, char *env[])
-{
-	int		i;
-	char	**env_paths;
-	char	*cmd_to_exec;
-
-	i = 0;
-	while (ft_strncmp(env[i], "PATH=", 5) != 0)
-		i++;
-	env_paths = ft_split(env[i] + 5, ':');
-	if (!env_paths)
-		return (perror("fail to split env"), NULL);
-	i = -1;
-	while (env_paths[++i])
-	{
-		cmd_to_exec = ft_strjoin1(env_paths[i], cmd);
-		if (!cmd_to_exec)
-		{
-			ft_free_path(env_paths);
-			return (NULL);
-		}
-		if (access(cmd_to_exec, X_OK) == 0)
-			return (ft_free_path(env_paths), cmd_to_exec);
-		free(cmd_to_exec);
-	}
-	ft_free_path(env_paths);
-	return (NULL);
-}
-
-void	relative_path(char *cmd, t_data *data)
+void	relative_path(char *cmd, char *av[], t_data *data, t_alloc *alloc)
 {
 	char	*cwd;
 	char	*full_path;
 
+	check_rel_arg(av[0], data, alloc);
 	cwd = getcwd(NULL, 0);
 	if (cwd == NULL)
-		handle_execve_fail(data, NULL);
-	full_path = malloc(ft_strlen(cwd) + ft_strlen(cmd + 2));
+		handle_execve_fail(data, NULL, "getcwd failed", alloc);
+	full_path = malloc(ft_strlen(cwd) + ft_strlen(cmd) + 2);
 	if (full_path == NULL)
 	{
 		free(cwd);
-		handle_execve_fail(data, NULL);
+		handle_execve_fail(data, NULL, "malloc failed for full path", alloc);
 	}
 	ft_strcpy(full_path, cwd);
-	ft_strlcat(full_path, "/", 1);
-	ft_strlcat(full_path, cmd, 1);
+	ft_strcat(full_path, "/");
+	ft_strcat(full_path, cmd);
 	free(cwd);
-	if (execve(full_path, &cmd, data->env) == -1)
-		handle_execve_fail(data, full_path);
+	if (execve(full_path, av, data->env) == -1)
+	{
+		if (errno == ENOENT)
+			handle_execve_fail(data, full_path, "Error", alloc);
+		else
+			handle_directory_fail(data, full_path, \
+			"Permission denied\n", alloc);
+	}
+}
+
+void	absolute_path(char *av[], t_data *data, t_alloc *alloc)
+{
+	struct stat	buff;
+
+	if (stat(av[0], &buff) == 0)
+	{
+		if (execve(av[0], av, data->env) == -1)
+			handle_directory_fail(data, NULL, "Error: Is a directory\n", alloc);
+	}
+	if (execve(av[0], av, data->env) == -1)
+		handle_execve_fail(data, NULL, "exec failed", alloc);
 }
 
 void	exec_cmd(char *av[], t_data *data, t_alloc *alloc)
 {
-	char	*path;
-
+	char		*path;
+	int			flag;
 
 	close_all_fd(data);
-	if (av[0][0] == '/')
+	free(data->pid);
+	data->pid = NULL;
+	rl_clear_history();
+	if (av[0] && av[0][0] == '/')
+		absolute_path(av, data, alloc);
+	else if (av[0] && check_built(av[0]))
 	{
-		if (execve(av[0], av, data->env) == -1)
-			handle_execve_fail(data, NULL);
+		flag = built_in(av, data, alloc);
+		free_alloc_pid(alloc, data);
+		exit (flag);
 	}
-	else if (check_built(av[0]))
-		exit (built_in(av, data, alloc));
-	else if (av[0][0] == '.')
-		relative_path(av[1], data);
-	else
+	else if (av[0] && av[0][0] == '.')
+		relative_path(av[0], av, data, alloc);
+	else if (av[0])
 	{
-		path = find_path(av[0], data->env);
+		path = find_path(av[0], data->env, data, alloc);
+		if (!path)
+			handle_execve_fail(data, path, "no path", alloc);
 		if (execve(path, av, data->env) == -1)
-			handle_execve_fail(data, path);
+			handle_execve_fail(data, path, "exec failed", alloc);
 	}
-	return ;
 }

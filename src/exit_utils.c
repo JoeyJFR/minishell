@@ -22,12 +22,15 @@ void	exit_parsing(char *str, t_alloc *data, int status)
 	}
 	if (str)
 		print_error(str);
+	data->exit_status = status;
+	rl_clear_history();
 	exit(status);
 }
 
 void	exit_with_msg(char *str, int status)
 {
 	print_error(str);
+	rl_clear_history();
 	exit(status);
 }
 

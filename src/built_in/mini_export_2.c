@@ -2,9 +2,11 @@
 
 int	check_name(char *str)
 {
+	if (!ft_isalpha(*str) || *str == '_')
+		return (1);
 	while (*str && *str != '=')
 	{
-		if (!ft_isalnum(*str) && *str != '_')
+		if (!ft_isualnum(*str))
 			return (1);
 		++str;
 	}
@@ -24,14 +26,15 @@ int	check_def(char *str)
 	return (0);
 }
 
-void	change_var(t_env *env, char *str, int i, t_alloc *alloc)
+int	change_var(t_env *env, char *str, int i)
 {
 	while (i--)
 		env = env->next;
 	free(env->str);
 	env->str = ft_strdup(str);
 	if (!env->str)
-		exit_parsing("Alloc", alloc, 1);
+		return (1);
+	return (0);
 }
 
 int	check_in_env(t_env *env, char *str)

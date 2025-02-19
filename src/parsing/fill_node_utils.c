@@ -1,111 +1,68 @@
 #include "../../minishell.h"
 
-//refaire fill_ope / fill_word
-char	*fill_ope(char **str, char *result)
-{
-	int		index_d;
-	int		index_s;
-	int		j;
 
-	index_d = 1;
-	index_s = 1;
-	j = 0;
-	while (**str && ((**str != ' ' && is_ope(**str, result)) || !index_d || !index_s))
-	{
-		if (**str == '\"' && (index_s % 2) && --index_d == 1)
-			index_d += 2;
-		else if (**str == '\'' && (index_d % 2) && --index_s == 1)
-			index_s += 2;
-		if ((index_s && !index_d && **str != '\"')
-			|| (index_d && !index_s && **str != '\'')
-			|| (index_d && index_s && **str != '\'' && **str != '\"'))
-			result[j++] = **str;
-		++(*str);
-	}
-	result[j] = '\0';
-	return (result);
+static int	ope_condition(char c, char *result, int in_quote, int x)
+{
+	if (!x)
+		return (1);
+	if (!c)
+		return (1);
+	if ((c == ' ' || !is_ope(c, result)) && !in_quote)
+		return (1);
+	return (0);
 }
 
-char	*fill_word(char **str, char *result)
+static int	word_condition(char c, char *result, int in_quote, int x)
 {
-	int		index_d;
-	int		index_s;
-	int		j;
-
-	index_d = 1;
-	index_s = 1;
-	j = 0;
-	while (**str && ((**str != ' ' && !is_ope(**str, result)) || !index_d || !index_s))
-	{
-		if (**str == '\"' && (index_s % 2) && --index_d == 1)
-			index_d += 2;
-		else if (**str == '\'' && (index_d % 2) && --index_s == 1)
-			index_s += 2;
-		if ((index_s && !index_d && **str != '\"')
-			|| (index_d && !index_s && **str != '\'')
-			|| (index_d && index_s && **str != '\'' && **str != '\"'))
-			result[j++] = **str;
-		++(*str);
-	}
-	result[j] = '\0';
-	return (result);
+	if (x)
+		return (1);
+	if (!c)
+		return (1);
+	if ((c == ' ' || is_ope(c, result)) && !in_quote)
+		return (1);
+	return (0);
 }
 
-int	len_word(char *s)
+char	*fill_str(char **buf, char *result, int x)
 {
+	int	in_quote;
 	int	i;
-	int	index_d;
-	int	index_s;
 
+	in_quote = 0;
 	i = 0;
-	index_s = 1;
-	index_d = 1;
-	while (*s)
+	while (!word_condition(**buf, result, in_quote, x) \
+		||  !ope_condition(**buf, result, in_quote, x))
 	{
-		if (*s == '\"' && (index_s % 2) && --index_d == 1)
-			index_d += 2;
-		else if (*s == '\'' && (index_d % 2) && --index_s == 1)
-			index_s += 2;
-		if (*s == ' ' && index_s && index_d)
-			break ;
-		++i;
-		++s;
+		if (update_quote_var(&in_quote, buf))
+			continue ;
+		result[i++] = *(*buf)++;
 	}
-	return (i);
+	result[i] = '\0';
+	return (result);
 }
-
-void	define_type(t_token *node)
+/* 
+char	*fill_ope(char **buf, char *result)
 {
-	if (node->str[0] == '/')
-		node->type = ABS;
-	else if (!ft_strcmp(node->str, "cd"))
-		node->type = CD;
-	else if (!ft_strcmp(node->str, "echo"))
-		node->type = ECHO;
-	else if (!ft_strcmp(node->str, "export"))
-		node->type = EXPORT;
-	else if (!ft_strcmp(node->str, "env"))
-		node->type = ENV;
-	else if (!ft_strcmp(node->str, "pwd"))
-		node->type = PWD;
-	else if (!ft_strcmp(node->str, "unset"))
-		node->type = UNSET;
-	else if (!ft_strcmp(node->str, "exit"))
-		node->type = EXIT;
-	else
-		node->type = ARG;
-}
+	int		i_d;
+	int		i_s;
+	int		j;
 
-void	define_ope(t_token *node)
-{
-	if (!ft_strcmp(node->str, "<<"))
-		node->type = DL;
-	else if (!ft_strcmp(node->str, ">>"))
-		node->type = DR;
-	else if (!ft_strcmp(node->str, "<"))
-		node->type = SL;
-	else if (!ft_strcmp(node->str, ">"))
-		node->type = SR;
-	else if (!ft_strcmp(node->str, "|"))
-		node->type = PI;
+	i_d = 1;
+	i_s = 1;
+	j = 0;
+	while (**buf && ((**buf != ' ' && is_ope(**buf, result)) || !i_d || !i_s))
+	{
+		if (**buf == '\"' && (i_s % 2) && --i_d == 1)
+			i_d += 2;
+		else if (**buf == '\'' && (i_d % 2) && --i_s == 1)
+			i_s += 2;
+		if ((i_s && !i_d && **buf != '\"')
+			|| (i_d && !i_s && **buf != '\'')
+			|| (i_d && i_s && **buf != '\'' && **buf != '\"'))
+			result[j++] = **buf;
+		++(*buf);
+	}
+	result[j] = '\0';
+	return (result);
 }
+ */

@@ -4,20 +4,19 @@ static int	exec_init(t_data *data, t_token *token, t_env *env)
 {
 	data->pid_nb = count_pid(token);
 	data->cmd_i = 0;
-	data->pid = malloc((sizeof(pid_t) * data->pid_nb));
 	data->infile = -1;
 	data->outfile = -2;
 	data->no_permission = 0;
-	data->core = 0;
+	(data->av)[0] = NULL;
+	data->pid = malloc((sizeof(pid_t) * data->pid_nb));
 	if (!data->pid)
-		return (perror("malloc for pid_nb"), 1);
+	{
+		write(STDERR_FILENO, "Error: malloc for pid_nb\n", 26);
+		return (1);
+	}
 	data->pid_nb = 0;
 	data->stdout_backup = dup(STDOUT_FILENO);
-	if (data->stdout_backup == -1)
-		return (perror("dup for stdout_backup"), 1);
 	data->stdin_backup = dup(STDIN_FILENO);
-	if (data->stdin_backup == -1)
-		return (perror("dup for stdin_backup"), 1);
 	reform_env(env, data->env);
 	return (0);
 }
@@ -30,7 +29,10 @@ static int	last_exec(char *av[], t_data *data, t_alloc *alloc)
 		return (0);
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork in last exec"), 1);
+	{
+		perror("fork in last exec");
+		return (1);
+	}
 	if (pid == 0)
 	{
 		signal(SIGQUIT, SIG_DFL);
@@ -75,39 +77,27 @@ int	parse_token(t_data *data, t_token **token, char *av[], t_alloc *alloc)
 
 int	exec(t_alloc *alloc, t_env *env, t_token *token)
 {
-	char	*av[BUFFER_SIZE];
 	t_data	data;
 
-	av[0] = NULL;
 	if (exec_init(&data, token, env))
-	{
-		if (data.pid)
-			free(data.pid);
-		return (close(data.stdin_backup), close(data.stdout_backup), get_error_code());
-	}
+		exit_parsing(NULL, alloc, 1);
 	while (token)
 	{
-		if (parse_token(&data, &token, av, alloc))
-			return (wait_free(&data, alloc), get_error_code());
+		if (parse_token(&data, &token, data.av, alloc))
+			waitfree_get_error_code(&data, alloc);
 		token = token->next;
 	}
 	if (data.cmd_i > 0)
 	{
-		av[data.cmd_i] = NULL;
-		if (check_only_builtin(av, alloc))
+		(data.av)[data.cmd_i] = NULL;
+		if (check_only_builtin(data.av, alloc))
 		{
-			alloc->exit_status = built_in(av, &data, alloc);
+			alloc->exit_status = built_in(data.av, &data, alloc);
 			wait_free(&data, alloc);
 			return (alloc->exit_status);
 		}
-		else
-		{
-			if (last_exec(av, &data, alloc))
-			{
-				wait_free(&data, alloc);
-				return (get_error_code());
-			}
-		}
+		else if (last_exec(data.av, &data, alloc))
+			waitfree_get_error_code(&data, alloc);
 	}
 	wait_free(&data, alloc);
 	return (alloc->exit_status);

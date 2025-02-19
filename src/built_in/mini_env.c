@@ -2,7 +2,7 @@
 
 int	mini_env(t_alloc *alloc)
 {
-	t_env *temp;
+	t_env	*temp;
 
 	temp = alloc->env_head;
 	while (temp)

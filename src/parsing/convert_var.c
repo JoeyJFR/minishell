@@ -3,13 +3,18 @@
 int	check_var(char *var, t_env *env)
 {
 	int	i;
+	int	var_len;
 
 	i = 0;
+	var_len = ft_strlen(var);
+	if (!var_len)
+		return (-1);
 	while (env)
 	{
-		if (!ft_strncmp(var, env->str, ft_strlen(var)))
+		if (!ft_strncmp(var, env->str, var_len) \
+			&& (env->str[var_len] == '=' || !env->str[var_len]))
 			return (i);
-		++i;	
+		++i;
 		env = env->next;
 	}
 	return (-1);
@@ -26,7 +31,7 @@ char	*add_code(char *old_str, t_env *env, int exit_code, int buf_len)
 	{
 		free(old_str);
 		free_env(env);
-		exit_with_msg("Malloc", 1);
+		exit_with_msg("Alloc", 1);
 	}
 	var_len = ft_strlen(old_str) + ft_strlen(var) + buf_len + 1;
 	str = ft_calloc(sizeof(char), var_len);
@@ -35,7 +40,7 @@ char	*add_code(char *old_str, t_env *env, int exit_code, int buf_len)
 		free(var);
 		free(old_str);
 		free_env(env);
-		exit_with_msg("Malloc", 1);
+		exit_with_msg("Alloc", 1);
 	}
 	str = ft_strcpy(str, old_str);
 	str = ft_strcat(str, var);
@@ -43,15 +48,16 @@ char	*add_code(char *old_str, t_env *env, int exit_code, int buf_len)
 	free(var);
 	return (str);
 }
-char *fill_var(char **buffer)
+
+char	*fill_var(char **buffer)
 {
 	char	*var;
 	int		i;
 
 	i = 0;
-	while (ft_isalnum((*buffer)[i]) || (*buffer)[i] == '_')
+	while (ft_isualnum((*buffer)[i]))
 		++i;
-	var = malloc(sizeof(char) * (i + 1));	
+	var = malloc(sizeof(char) * (i + 1));
 	if (!var)
 		return (NULL);
 	i = 0;
@@ -66,8 +72,9 @@ char	*handle_var(char *str, char **buf, t_env *env, int exit_code)
 	char	*var;
 	int		var_index;
 
-	++(*buf);
-	if (**buf == '?')	
+	if (ft_isualnum(*(*buf + 1)) || *(*buf + 1) == '?')
+		++(*buf);
+	if (**buf == '?')
 		str = add_code(str, env, exit_code, ft_strlen(++(*buf)));
 	else
 	{
@@ -76,7 +83,7 @@ char	*handle_var(char *str, char **buf, t_env *env, int exit_code)
 		{
 			free(str);
 			free_env(env);
-			exit_with_msg("Malloc", 1);
+			exit_with_msg("Alloc", 1);
 		}
 		var_index = check_var(var, env);
 		free(var);
@@ -97,11 +104,11 @@ char	*convert_var(char *buf, t_env *env, int exit_code)
 	if (!str)
 	{
 		free_env(env);
-		exit_with_msg("Malloc", 1);
+		exit_with_msg("Alloc", 1);
 	}
 	while (*buf)
 	{
-		if (*buf == '$' && !is_in_squote(str))
+		if (*buf == '$' && !is_in_squote(str) && *(buf + 1))
 		{
 			str = handle_var(str, &buf, env, exit_code);
 			if (str == NULL)

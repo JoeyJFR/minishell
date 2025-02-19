@@ -6,7 +6,7 @@
 /*   By: vgarcia <vgarcia@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 13:15:20 by vgarcia           #+#    #+#             */
-/*   Updated: 2025/02/11 09:58:30 by vgarcia          ###   ########.fr       */
+/*   Updated: 2025/02/18 12:40:40 by vgarcia          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,13 @@ int		ft_writestr(char *s);
 int		count_word(const char *s, char c);
 void	free_tab(char **tab);
 char	*ft_strcat(char *dst, const char *src);
+int		ft_isualnum(int c);
+char	*ft_strcpy(char *s1, const char *s2);
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 4096
 # endif
 
-char	*ft_strcpy(char *s1, const char *s2);
 char	*get_next_line(int fd);
 
 #endif

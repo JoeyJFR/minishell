@@ -10,11 +10,7 @@ int	check_syntax(t_token *token)
 			return (1);
 		token = token->next;
 	}
-	if (token->type > 8)
+	if (token && token->type > 8)
 		return (1);
 	return (0);
 }
-
-// si ope a la fin
-// si deux ope colle
-// si premier noeud == pipe

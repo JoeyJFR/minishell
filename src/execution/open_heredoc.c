@@ -1,10 +1,11 @@
 #include "../../minishell.h"
 
-
-void	open_heredoc(t_token *parse_result)
+void	open_heredoc(t_token *parse_result, t_data *data)
 {
 	char	*s;
 
+	if (STDIN_FILENO != data->stdin_backup)
+		dup2(data->stdin_backup, STDIN_FILENO);
 	while (1)
 	{
 		ft_putstr_fd("> ", STDOUT_FILENO);
@@ -20,5 +21,6 @@ void	open_heredoc(t_token *parse_result)
 			free(s);
 			break ;
 		}
+		free(s);
 	}
 }

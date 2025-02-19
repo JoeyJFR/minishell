@@ -1,46 +1,6 @@
 #include "../../minishell.h"
 
 /*
-check if there is a quote unpaired and return the first's
-*/
-int	check_quotes(char *s)
-{
-	int	check_first;
-	int	index_d;
-	int	index_s;
-	int	i;
-
-	index_s = 0;
-	index_d = 0;
-	i = -1;
-	while (s[++i])
-	{
-		if (s[i] == '\"' && !(index_s % 2) && ++index_d)
-			check_first = i;
-		if (s[i] == '\'' && !(index_d % 2) && ++index_s)
-			check_first = i;
-	}
-	if ((index_s % 2) || (index_d % 2))
-		return (check_first);
-	return (-1);
-}
-
-/*
-checks if the unpaired quote is a single
-*/
-int	is_in_squote(char *str)
-{
-	int	checker;
-
-	checker = check_quotes(str);
-	if (checker == -1)
-		return (0);
-	if (str[checker] == '\'')
-		return (1);
-	return (0);
-}
-
-/*
 checks what is the current operator it is dealing with
 */
 int	is_ope(char c, char *current)
@@ -70,7 +30,7 @@ int	count_cmd(t_token *token)
 	if (token)
 		i = 1;
 	while (token->prev)
-	 	token = token->prev;
+		token = token->prev;
 	while (token)
 	{
 		if (token->type == PI)
@@ -78,4 +38,50 @@ int	count_cmd(t_token *token)
 		token = token->next;
 	}
 	return (i);
+}
+
+void	define_type(t_token *node)
+{
+	if (node->str[0] == '/')
+		node->type = ABS;
+	else if (!ft_strcmp(node->str, "cd"))
+		node->type = CD;
+	else if (!ft_strcmp(node->str, "echo"))
+		node->type = ECHO;
+	else if (!ft_strcmp(node->str, "export"))
+		node->type = EXPORT;
+	else if (!ft_strcmp(node->str, "env"))
+		node->type = ENV;
+	else if (!ft_strcmp(node->str, "pwd"))
+		node->type = PWD;
+	else if (!ft_strcmp(node->str, "unset"))
+		node->type = UNSET;
+	else if (!ft_strcmp(node->str, "exit"))
+		node->type = EXIT;
+	else
+		node->type = ARG;
+}
+
+void	define_ope(t_token *node)
+{
+	if (!ft_strcmp(node->str, "<<"))
+		node->type = DL;
+	else if (!ft_strcmp(node->str, ">>"))
+		node->type = DR;
+	else if (!ft_strcmp(node->str, "<"))
+		node->type = SL;
+	else if (!ft_strcmp(node->str, ">"))
+		node->type = SR;
+	else if (!ft_strcmp(node->str, "|"))
+		node->type = PI;
+}
+
+void	print_token(t_token *token)
+{
+	while (token)
+	{
+		printf("[%s]", token->str);
+		token = token->next;
+	}
+	printf("\n");
 }

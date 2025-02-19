@@ -1,6 +1,6 @@
 #include "../../minishell.h"
 
-char *fill_var_def(char *def, t_env *env, char *old_str, int buffer_len)
+char	*fill_var_def(char *def, t_env *env, char *old_str, int buffer_len)
 {
 	char	*var;
 	int		var_len;
@@ -11,7 +11,7 @@ char *fill_var_def(char *def, t_env *env, char *old_str, int buffer_len)
 	{
 		free(old_str);
 		free_env(env);
-		exit_with_msg("Malloc", 1);
+		exit_with_msg("Alloc", 1);
 	}
 	var = ft_strcat(var, old_str);
 	var = ft_strcat(var, "\"");
@@ -34,8 +34,14 @@ char	*add_env_var(char *str, t_env *env, int var_i, int buf_len)
 	++i;
 	j = i;
 	while (env->str[j])
+	{
 		if (env->str[j++] == '"')
-			return (free(str), print_error("Backslash case"), NULL);
+		{
+			free(str);
+			print_error("Backslash case");
+			return (NULL);
+		}
+	}
 	str = fill_var_def(&env->str[i], env, str, buf_len);
 	return (str);
 }

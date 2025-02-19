@@ -1,14 +1,12 @@
-
 #include "../../minishell.h"
 
-// check malloc getcwd vs getcwd no find != ?
 int	mini_pwd(char *av[])
 {
 	char	*pwd;
 
 	if (av[1] && av[1][0] == '-')
 	{
-		write(STDOUT_FILENO, "mini_pwd has no options\n", 24);
+		print_error("mini_pwd has no options");
 		return (1);
 	}
 	pwd = getcwd(NULL, 0);

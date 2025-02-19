@@ -20,11 +20,12 @@ static	void	loop_call(t_token *parse_result, int fd[])
 			break ;
 		}
 		ft_putstr_fd(s, fd[1]);
+		free(s);
 	}
 	return ;
 }
 
-int	handle_heredoc(t_token *parse_result)
+int	handle_heredoc(t_token *parse_result, t_data *data)
 {
 	int		fd[2];
 
@@ -33,14 +34,10 @@ int	handle_heredoc(t_token *parse_result)
 		perror("pipe in here_doc");
 		return (1);
 	}
+	if (STDIN_FILENO != data->stdin_backup)
+		dup2(data->stdin_backup, STDIN_FILENO);
 	loop_call(parse_result, fd);
-	if (dup2(fd[0], STDIN_FILENO) == -1)
-	{
-		perror("dup2 in here_doc");
-		close(fd[0]);
-		close(fd[1]);
-		return (1);
-	}
+	dup2(fd[0], STDIN_FILENO);
 	close(fd[0]);
 	close(fd[1]);
 	return (0);
